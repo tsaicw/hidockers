@@ -8,6 +8,10 @@ RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main' >> "
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
 RUN apt-get -y update
 RUN /bin/echo debconf shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install oracle-java8-installer oracle-java8-set-default
+RUN apt-get -y install oracle-java8-installer oracle-java8-set-default
+
+# Install curl
+RUN apt-get -y install curl
+
 RUN rm -rf /var/lib/apt/lists/*
 
