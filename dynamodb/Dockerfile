@@ -8,8 +8,8 @@ ENV DYNAMODB_PORT 8000
 RUN mkdir -p $DYNAMODB_HOME
 WORKDIR $DYNAMODB_HOME
 RUN curl -SL --silent http://dynamodb-local.s3-website-us-west-2.amazonaws.com/dynamodb_local_latest.tar.gz | tar zxfv -
-
+COPY start_dynamodb.sh $DYNAMODB_HOME
 
 EXPOSE $DYNAMODB_PORT
-CMD ["java", "-Djava.library.path=./DynamoDBLocal_lib", "-jar", "DynamoDBLocal.jar", "-inMemory", "-sharedDb", "-port", "8000"]
+ENTRYPOINT ["./start_dynamodb.sh"]
 
