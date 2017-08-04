@@ -7,6 +7,6 @@ Environment:
 
 Usage:
 ```
-$ docker run -d -rm -p 27017:27017 -v $PWD/data:/data --name mongo mongo
+$ docker run -d --rm -p 27017:27017 -v $PWD/mongo:/data --name mongodb mongodb
 ```
 
