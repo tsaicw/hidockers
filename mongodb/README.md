@@ -3,7 +3,7 @@
 Environment:
 
 - Debian Jessie-slim
-- MongoDB 3.5
+- MongoDB 3.4
 
 Usage:
 ```
