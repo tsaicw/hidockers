@@ -8,6 +8,6 @@ Environment:
 
 Usage:
 ```
-$ docker run -d -p 8000:8000 --name dynamo dynamo
+$ docker run -d -rm -p 8000:8000 --name dynamo dynamo
 ```
 
