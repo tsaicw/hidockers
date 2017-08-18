@@ -1,0 +1,43 @@
+version: '3'
+services:
+  registry:
+    container_name: registry
+    image: registry:2
+    deploy:
+      mode: replicated  # replicated | global
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager  # manager | worker
+      restart_policy:
+        condition: any  # none | on-failure | any(default)
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./certs:/certs
+      - ./registry:/var/lib/registry/docker/registry
+    networks:
+      - ocarina
+    environment:
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ocarina.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/ocarina.key
+
+  visualizer:
+    container_name: visualizer
+    image: dockersamples/visualizer:stable
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - '8080:8080'
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    networks:
+      - ocarina
+
+# volumes:
+
+networks:
+  ocarina:
+
