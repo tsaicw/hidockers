@@ -2,6 +2,6 @@
 
 Environment:
 
-- Ubuntu 16.04 LTS
-- Java SE Development Kit 8
+- Ubuntu 18.04 LTS
+- OpenJDK Development Kit 11
 
