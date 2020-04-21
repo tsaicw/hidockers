@@ -9,7 +9,7 @@ RUN apt-get -y update
 RUN apt-get -y install openjdk-${jdkVersion}-jdk
 
 # Update packages and install curl
-RUN apt-get -y install curl && apt-get -y upgrade && apt-get -y autoremove
+RUN apt-get -y install curl vim && apt-get -y upgrade && apt-get -y autoremove
 
 # Remove the APT sources lists
 RUN rm -rf /var/lib/apt/lists/*
