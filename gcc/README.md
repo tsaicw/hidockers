@@ -7,5 +7,5 @@ Environment:
 
 Reference:
 
-- https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/
+- [How to Install GCC Compiler on Ubuntu 18.04](https://linuxize.com/post/how-to-install-gcc-compiler-on-ubuntu-18-04/)
 
