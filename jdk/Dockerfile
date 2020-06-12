@@ -5,12 +5,11 @@ MAINTAINER Daniel Tsai <galoistsai@gmail.com>
 ARG jdkVersion=11
 
 # Install OpenJDK 11
-RUN apt-get -y update
-RUN apt-get -y install openjdk-${jdkVersion}-jdk
-
-# Update packages and install curl
-RUN apt-get -y install curl vim && apt-get -y upgrade && apt-get -y autoremove
-
+RUN apt-get -y update \
+ && apt-get -y install \
+      openjdk-${jdkVersion}-jdk \
+      curl \
+      vim \
 # Remove the APT sources lists
-RUN rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/*
 
