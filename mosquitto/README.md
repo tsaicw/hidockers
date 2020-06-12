@@ -2,7 +2,7 @@
 
 Environment:
 
-- Ubuntu 18.04 LTS
+- Alpine 3.12
 - Mosquitto MQTT message broker
 
 Usage:

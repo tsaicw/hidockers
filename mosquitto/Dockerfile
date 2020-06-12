@@ -1,14 +1,11 @@
-FROM ubuntu:18.04
+FROM alpine:3.12
 MAINTAINER Daniel Tsai <galoistsai@gmail.com>
 
 # Environment variables
 ENV MQTT_PORT 1883
 
 # Install Mosquitto MQTT broker
-RUN apt-get -y update \
- && apt-get -y install mosquitto \
-# Remove the APT sources lists
- && rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache mosquitto
 
 EXPOSE $MQTT_PORT
 ENTRYPOINT ["/usr/sbin/mosquitto"]
