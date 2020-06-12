@@ -7,4 +7,5 @@ Docker images:
 - dynamodb - Amazon DynamoDB server
 - mongodb - MongoDB server
 - cassandra - Cassandra server
+- mosquitto - Mosquitto MQTT broker
 
