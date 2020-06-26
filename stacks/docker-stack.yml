@@ -14,7 +14,7 @@ services:
     ports:
       - '5000:5000'
     volumes:
-      - ./registry:/var/lib/registry/docker/registry
+      - ./registry:/var/lib/registry
     networks:
       - ocarina
 
@@ -33,7 +33,7 @@ services:
       - '5000:5000'
     volumes:
       - ./certs:/certs
-      - ./registry:/var/lib/registry/docker/registry
+      - ./registry:/var/lib/registry
     networks:
       - ocarina
     environment:

@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  registry-nossl:
+    container_name: registry-nossl
+    image: registry:2.7
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./registry:/var/lib/registry
+    restart: always
+
+  registry:
+    container_name: registry
+    image: registry:2.7
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./certs:/certs
+      - ./registry:/var/lib/registry
+    restart: always
+    environment:
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ocarina.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/ocarina.key
+
