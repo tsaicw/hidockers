@@ -1,8 +1,7 @@
-version: '3'
+version: '3.8'
 services:
   registry-nossl:
-    container_name: registry-nossl
-    image: registry:2
+    image: registry:2.7
     deploy:
       mode: replicated  # replicated | global
       replicas: 1
@@ -11,16 +10,17 @@ services:
           - node.role == manager  # manager | worker
       restart_policy:
         condition: any  # none | on-failure | any(default)
+    networks:
+      - ocarina
     ports:
       - '5000:5000'
     volumes:
-      - ./registry:/var/lib/registry
-    networks:
-      - ocarina
+      - type: bind
+        source: ./registry
+        target: /var/lib/registry
 
   registry:
-    container_name: registry
-    image: registry:2
+    image: registry:2.7
     deploy:
       mode: replicated  # replicated | global
       replicas: 1
@@ -29,19 +29,26 @@ services:
           - node.role == manager  # manager | worker
       restart_policy:
         condition: any  # none | on-failure | any(default)
-    ports:
-      - '5000:5000'
-    volumes:
-      - ./certs:/certs
-      - ./registry:/var/lib/registry
     networks:
       - ocarina
+    ports:
+      - '443:443'
+    volumes:
+      - type: bind
+        source: ./certs
+        target: /certs
+      - type: bind
+        source: ./registry
+        target: /var/lib/registry
+      # - type: volume
+      #   source: registry
+      #   target: /var/lib/registry
     environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
       - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ocarina.crt
       - REGISTRY_HTTP_TLS_KEY=/certs/ocarina.key
 
   visualizer:
-    container_name: visualizer
     image: dockersamples/visualizer:stable
     deploy:
       placement:
@@ -50,11 +57,14 @@ services:
     ports:
       - '8080:8080'
     volumes:
-      - '/var/run/docker.sock:/var/run/docker.sock'
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
     networks:
       - ocarina
 
 # volumes:
+#   registry:
 
 networks:
   ocarina:

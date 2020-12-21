@@ -6,19 +6,26 @@ services:
     ports:
       - '5000:5000'
     volumes:
-      - ./registry:/var/lib/registry
+      - type: bind
+        source: ./registry
+        target: /var/lib/registry
     restart: always
 
   registry:
     container_name: registry
     image: registry:2.7
     ports:
-      - '5000:5000'
+      - '443:443'
     volumes:
-      - ./certs:/certs
-      - ./registry:/var/lib/registry
+      - type: bind
+        source: ./certs
+        target: /certs
+      - type: bind
+        source: ./registry
+        target: /var/lib/registry
     restart: always
     environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
       - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/ocarina.crt
       - REGISTRY_HTTP_TLS_KEY=/certs/ocarina.key
 
