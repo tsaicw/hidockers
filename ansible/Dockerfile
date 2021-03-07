@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates \
       curl vim gnupg software-properties-common vim git python3-pip \
 # Install Ansible & ansible[azure] module
-    && pip3 install ansible==${ansibleVersion}} \
+    && pip3 install ansible==${ansibleVersion} \
     && pip3 install 'ansible[azure]' \
     && pip3 install netaddr
 
