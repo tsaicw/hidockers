@@ -5,6 +5,6 @@
   * Mosquitto MQTT message broker
 
 ## Usage:
-```
+```console
 docker container run -d --rm -p 1883:1883 --name mqttbroker galoistsai/mosquitto
 ```

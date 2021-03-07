@@ -6,7 +6,7 @@
   * DynamoDB
 
 ## Usage:
-```
+```console
 docker container run -d --rm -p 8000:8000 --name dynamodb galoistsai/dynamodb
 ```
 
