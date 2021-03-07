@@ -1,5 +1,5 @@
 FROM ubuntu:18.04
-MAINTAINER Daniel Tsai <galoistsai@gmail.com>
+LABEL maintainer="galoistsai@gmail.com"
 
 # Environment variables
 

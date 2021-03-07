@@ -1,12 +1,11 @@
-## MongoDB Docker
+# MongoDB Docker
 
-Environment:
+## Environment:
+  * Debian Jessie-slim
+  * MongoDB 3.4
 
-- Debian Jessie-slim
-- MongoDB 3.4
-
-Usage:
+## Usage:
 ```
-$ docker run -d --rm -p 27017:27017 -v $PWD/mongo:/data --name mongodb mongodb
+docker container run -d --rm -p 27017:27017 -v $PWD/mongo:/data --name mongodb galoistsai/mongodb
 ```
 

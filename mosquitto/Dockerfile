@@ -1,5 +1,5 @@
 FROM alpine:3.12
-MAINTAINER Daniel Tsai <galoistsai@gmail.com>
+LABEL maintainer="galoistsai@gmail.com"
 
 # Environment variables
 ENV MQTT_PORT 1883

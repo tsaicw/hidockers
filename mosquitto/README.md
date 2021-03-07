@@ -1,11 +1,10 @@
-## Mosquitto MQTT broker
+# Mosquitto MQTT broker
 
-Environment:
+## Environment:
+  * Alpine 3.12
+  * Mosquitto MQTT message broker
 
-- Alpine 3.12
-- Mosquitto MQTT message broker
-
-Usage:
+## Usage:
 ```
-$ docker container run -d --rm -p 1883:1883 --name mqttbroker mosquitto
+docker container run -d --rm -p 1883:1883 --name mqttbroker galoistsai/mosquitto
 ```

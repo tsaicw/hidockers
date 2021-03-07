@@ -1,5 +1,5 @@
 FROM galoistsai/jdk:latest
-MAINTAINER Daniel Tsai <galoistsai@gmail.com>
+LABEL maintainer="galoistsai@gmail.com"
 
 ENV DYNAMODB_HOME /opt/dynamodb
 ENV DYNAMODB_PORT 8000
