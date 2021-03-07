@@ -1,7 +1,7 @@
 FROM ubuntu:20.04
 LABEL maintainer="galoistsai@gmail.com"
 
-# Environment variables
+# Build arguments
 ARG jdkVersion=11
 
 # Install OpenJDK 11

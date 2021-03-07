@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  ansible:
+    image: galoistsai/ansible:v2.9
+    # volumes:
+    #   - type: bind
+    #     source: $PWD/ansible
+    #     target: /home/ansible
+    #   - type: bind
+    #     source: $HOME/ansible_secrets
+    #     target: /root/ansible_secrets
+    #   - type: bind
+    #     source: $HOME/.azure
+    #     target: /root/.azure
+    working_dir: /home/ansible
+    command: bash
