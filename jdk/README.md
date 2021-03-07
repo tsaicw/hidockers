@@ -1,7 +1,6 @@
-## JDK Docker
+# JDK Docker
 
 Environment:
-
-- Ubuntu 18.04 LTS
-- OpenJDK Development Kit 11
+  * Ubuntu 20.04 LTS
+  * OpenJDK Development Kit 11
 

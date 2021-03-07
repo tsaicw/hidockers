@@ -1,5 +1,5 @@
-FROM ubuntu:18.04
-MAINTAINER Daniel Tsai <galoistsai@gmail.com>
+FROM ubuntu:20.04
+LABEL maintainer="galoistsai@gmail.com"
 
 # Environment variables
 ARG jdkVersion=11
