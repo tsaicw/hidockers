@@ -1,0 +1,56 @@
+version: "3.8"
+services:
+  jenkins-docker:
+    image: docker:dind
+    network_mode: 'host'
+    # networks:
+    #   jenkins:
+    #     aliases:
+    #       - docker
+    # ports:
+    #   - "2376:2376"
+    privileged: true
+    volumes:
+      - type: bind
+        source: $PWD/volumes/certs
+        target: /certs/client
+      - type: bind
+        source: $PWD/volumes/jenkins_home
+        target: /var/jenkins_home
+    # extra_hosts:
+    #   - 'host.docker.internal:host-gateway'
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+
+  jenkins:
+    image: galoistsai/jenkins:2.263
+    depends_on:
+      - jenkins-docker
+    network_mode: 'host'
+    # networks:
+    #   jenkins:
+    # ports:
+    #   - "8080:8080"
+    #   - "50000:50000"
+    volumes:
+      - type: bind
+        source: $PWD/volumes/certs
+        target: /certs/client
+        read_only: true
+      - type: bind
+        source: $PWD/volumes/jenkins_home
+        target: /var/jenkins_home
+      - type: bind
+        source: $PWD/volumes/GitRepo
+        target: /home/GitRepo
+      - type: bind
+        source: $HOME/.ssh/id_rsa
+        target: /var/jenkins_home/.ssh/id_rsa
+    environment:
+#       - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_HOST=tcp://localhost:2376
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_TLS_VERIFY=1
+
+# networks:
+#   jenkins:
