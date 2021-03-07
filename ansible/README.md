@@ -2,7 +2,7 @@
 
 ## Environment:
   * Ubuntu 20.04 LTS
-  * Ansible 2.9.18
+  * Ansible v2.9.18
 
 ## Usage:
 ```console
