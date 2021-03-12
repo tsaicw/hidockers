@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y apt-transport-https ca-certificates \
 # Install Ansible & ansible[azure] module
     && pip3 install ansible==${ansibleVersion} \
     && pip3 install 'ansible[azure]' \
-    && pip3 install netaddr
+    && pip3 install netaddr boto
 
 # Install Azure CLI
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null \
