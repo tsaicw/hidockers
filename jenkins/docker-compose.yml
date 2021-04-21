@@ -1,4 +1,7 @@
 version: "3.8"
+# networks:
+#   jenkins:
+
 services:
   jenkins-docker:
     image: docker:dind
@@ -23,7 +26,7 @@ services:
       - DOCKER_TLS_CERTDIR=/certs
 
   jenkins:
-    image: galoistsai/jenkins:2.263
+    image: galoistsai/jenkins:2.277.2
     depends_on:
       - jenkins-docker
     network_mode: 'host'
@@ -51,6 +54,3 @@ services:
       - DOCKER_HOST=tcp://localhost:2376
       - DOCKER_CERT_PATH=/certs/client
       - DOCKER_TLS_VERIFY=1
-
-# networks:
-#   jenkins:

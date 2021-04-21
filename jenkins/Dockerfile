@@ -20,12 +20,12 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - > /d
 
 USER jenkins
 # Install jenkins plugins
-RUN jenkins-plugin-cli --plugins blueocean:1.24.5 \
+RUN jenkins-plugin-cli --plugins blueocean:1.24.6 \
                                  cloudbees-disk-usage-simple:0.10 \
-                                 git:4.7.0 \
+                                 git:4.7.1 \
                                  github-branch-source:2.10.2 \
-                                 gitlab-plugin:1.5.19 \
+                                 gitlab-plugin:1.5.20 \
                                  metrics:4.0.2.7 \
                                  Office-365-Connector:4.14.0 \
-                                 prometheus:2.0.8 \
-                                 slack:2.46
+                                 prometheus:2.0.10 \
+                                 slack:2.47
