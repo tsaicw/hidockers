@@ -2,7 +2,7 @@
 
 ## Environment:
   * Debian Buster-slim
-  * Jenkins 2.277.2
+  * Jenkins 2.277.x
 
 ## Usage:
 ```console

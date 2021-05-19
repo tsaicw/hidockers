@@ -26,7 +26,7 @@ services:
       - DOCKER_TLS_CERTDIR=/certs
 
   jenkins:
-    image: galoistsai/jenkins:2.277.2
+    image: galoistsai/jenkins:2.277
     depends_on:
       - jenkins-docker
     network_mode: 'host'

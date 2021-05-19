@@ -23,9 +23,9 @@ USER jenkins
 RUN jenkins-plugin-cli --plugins blueocean:1.24.6 \
                                  cloudbees-disk-usage-simple:0.10 \
                                  git:4.7.1 \
-                                 github-branch-source:2.10.2 \
+                                 github-branch-source:2.10.4 \
                                  gitlab-plugin:1.5.20 \
                                  metrics:4.0.2.7 \
-                                 Office-365-Connector:4.14.0 \
+                                 Office-365-Connector:4.15.0 \
                                  prometheus:2.0.10 \
-                                 slack:2.47
+                                 slack:2.48
