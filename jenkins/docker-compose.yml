@@ -6,6 +6,7 @@ services:
   jenkins-docker:
     image: docker:dind
     network_mode: 'host'
+    restart: always
     # networks:
     #   jenkins:
     #     aliases:
@@ -30,6 +31,7 @@ services:
     depends_on:
       - jenkins-docker
     network_mode: 'host'
+    restart: always
     # networks:
     #   jenkins:
     # ports:
