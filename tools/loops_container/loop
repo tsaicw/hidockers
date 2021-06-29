@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# set -e
+
+function sigint() {
+  echo "Process got SIGINT and it is exiting ..."
+  run=false
+}
+
+function sigterm() {
+  echo "Process got SIGTERM and it is exiting ..."
+  run=false
+}
+
+trap 'sigint' INT
+trap 'sigterm' TERM
+
+while ${run}; do sleep 1; done
