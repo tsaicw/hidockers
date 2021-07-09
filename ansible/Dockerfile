@@ -2,17 +2,19 @@ FROM ubuntu:20.04
 LABEL maintainer="galoistsai@gmail.com"
 
 # Build arguments
-ARG ansibleVersion=2.9.18
+ARG ansibleVersion=2.9.23
 
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install related packages
 RUN apt-get update && apt-get install -y apt-transport-https ca-certificates \
-      curl vim gnupg software-properties-common vim git python3-pip \
+      curl vim gnupg software-properties-common git python3-pip \
 # Install Ansible & ansible[azure] module
     && pip3 install ansible==${ansibleVersion} \
     && pip3 install 'ansible[azure]' \
-    && pip3 install netaddr boto
+    && pip3 install netaddr boto \
+# Create Azure profile folder
+    && mkdir /root/.azure
 
 # Install Azure CLI
 RUN curl -sL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg > /dev/null \
