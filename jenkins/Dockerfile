@@ -26,7 +26,7 @@ RUN jenkins-plugin-cli --plugins ansicolor:1.0.0 \
                                  git:4.7.2 \
                                  github-branch-source:2.11.1 \
                                  gitlab-plugin:1.5.20 \
-                                 metrics:4.0.2.7 \
+                                 metrics:4.0.2.8 \
                                  Office-365-Connector:4.15.0 \
                                  prometheus:2.0.10 \
                                  slack:2.48
