@@ -1,0 +1,23 @@
+listener 8883 0.0.0.0
+
+#
+# SSL/TLS certificates
+#
+cafile /etc/mosquitto/ca_certificates/ca.crt
+# capath /etc/mosquitto/ca_certificates/
+certfile /etc/mosquitto/certs/server.crt
+keyfile /etc/mosquitto/certs/server.key
+require_certificate true
+
+#
+# Authentication
+#
+allow_anonymous false
+allow_zero_length_clientid false
+
+# use_identity_as_username true
+# use_subject_as_username true
+
+password_file /etc/mosquitto/auth/pwfile
+acl_file /etc/mosquitto/auth/aclfile
+# psk_file /etc/mosquitto/auth/pskfile

@@ -1,11 +1,14 @@
-FROM alpine:3.12
-LABEL maintainer="galoistsai@gmail.com"
-
-# Environment variables
-ENV MQTT_PORT 1883
+FROM alpine:3.14
 
 # Install Mosquitto MQTT broker
-RUN apk add --no-cache mosquitto
+RUN apk add --no-cache mosquitto mosquitto-clients
 
-EXPOSE $MQTT_PORT
+COPY ca_certificates /etc/mosquitto/ca_certificates
+COPY certs /etc/mosquitto/certs
+
+RUN chown -R mosquitto.mosquitto /etc/mosquitto/certs/*
+
+EXPOSE 1883
+EXPOSE 8883
+
 ENTRYPOINT ["/usr/sbin/mosquitto"]

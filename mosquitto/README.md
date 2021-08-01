@@ -1,10 +1,10 @@
 # Mosquitto MQTT broker
 
 ## Environment:
-  * Alpine 3.12
+  * Alpine 3.14
   * Mosquitto MQTT message broker
 
 ## Usage:
 ```console
-docker container run -d --rm -p 1883:1883 --name mqttbroker galoistsai/mosquitto
+docker-compose up -d
 ```

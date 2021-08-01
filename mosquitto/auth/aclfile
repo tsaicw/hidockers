@@ -1,0 +1,24 @@
+# user <username>
+# topic [read|write|readwrite|deny] <topic>
+# pattern [read|write|readwrite|deny] <topic>
+
+# This affects access control for clients with no username.
+topic read $SYS/#
+
+# This only affects clients with username "sub_client".
+user sub_client
+topic read hello/world
+topic readwrite test
+
+# This only affects clients with username "pub_client".
+user pub_client
+topic write hello/world
+topic readwrite test
+
+# This only affects clients with username "mqtt-explorer".
+user mqtt-explorer
+topic write hello/world
+topic readwrite test
+
+# This affects all clients.
+pattern write $SYS/broker/connection/%c/state

@@ -1,0 +1,39 @@
+version: '3.8'
+
+volumes:
+  data:
+
+services:
+  mosquitto:
+    image: mosquitto:alpine
+    build: ${PWD}
+    hostname: mosquitto
+    restart: always
+    ports:
+      - '1883:1883'
+      - '8883:8883'
+    volumes:
+      - type: bind
+        source: ${PWD}/mosquitto.conf
+        target: /etc/mosquitto/mosquitto.conf
+      - type: bind
+        source: ${PWD}/conf.d
+        target: /etc/mosquitto/conf.d
+      - type: bind
+        source: ${PWD}/auth
+        target: /etc/mosquitto/auth
+      # - type: bind
+      #   source: ${PWD}/ca_certificates
+      #   target: /etc/mosquitto/ca_certificates
+      # - type: bind
+      #   source: ${PWD}/certs
+      #   target: /etc/mosquitto/certs
+      # - type: bind
+      #   source: ${PWD}/clients
+      #   target: /etc/mosquitto/clients
+      - type: volume
+        source: data
+        target: /var/lib/mosquitto/
+    command:
+      - --config-file
+      - /etc/mosquitto/mosquitto.conf
