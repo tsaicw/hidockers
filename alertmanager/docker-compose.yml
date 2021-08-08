@@ -1,0 +1,30 @@
+version: '3.8'
+volumes:
+  am_data:
+
+networks:
+  promnet:
+  # hostnet:
+  #   external: true
+  #   name: 'host'
+
+services:
+  alertmanager:
+    image: prom/alertmanager:v0.22.2
+    hostname: alertmanager
+    networks:
+      promnet:
+      # hostnet:
+    ports:
+      - '9093:9093'
+    volumes:
+      - type: bind
+        source: ${PWD}/config/alertmanager.yml
+        target: /etc/alertmanager/alertmanager.yml
+      - type: volume
+        source: am_data
+        target: /alertmanager
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
