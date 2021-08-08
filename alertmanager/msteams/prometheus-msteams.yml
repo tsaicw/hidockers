@@ -1,0 +1,19 @@
+version: '3.8'
+networks:
+  promnet:
+
+services:
+  promteams:
+    image: quay.io/prometheusmsteams/prometheus-msteams
+    hostname: promteams
+    networks:
+      promnet:
+    ports:
+      - '2000:2000'
+    environment:
+      # - TEAMS_INCOMING_WEBHOOK_URL=
+      - TEAMS_REQUEST_URI=alertmanager
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any

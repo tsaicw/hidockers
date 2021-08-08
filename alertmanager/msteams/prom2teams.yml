@@ -1,0 +1,15 @@
+version: '3.8'
+networks:
+  promnet:
+
+services:
+  prom2teams:
+    image: idealista/prom2teams
+    hostname: prom2teams
+    networks:
+      promnet:
+    ports:
+      - '8089:8089'
+    environment:
+      # - PROM2TEAMS_CONNECTOR=
+      # - PROM2TEAMS_GROUP_ALERTS_BY=
