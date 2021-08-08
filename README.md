@@ -9,3 +9,4 @@
   * mongodb: MongoDB server
   * cassandra: Cassandra server
   * mosquitto: Mosquitto MQTT broker
+  * grafana: Grafana visual dashboard

@@ -1,0 +1,39 @@
+version: '3.8'
+volumes:
+  gra_config:
+  gra_data:
+  gra_log:
+
+networks:
+  promnet:
+  # hostnet:
+  #   external: true
+  #   name: 'host'
+
+services:
+  grafana:
+    image: grafana/grafana:8.1.0
+    hostname: grafana
+    networks:
+      promnet:
+      # hostnet:
+    ports:
+      - '3000:3000'
+    volumes:
+      - type: volume
+        source: gra_data
+        target: /var/lib/grafana
+      - type: volume
+        source: gra_config
+        target: /etc/grafana
+      - type: volume
+        source: gra_log
+        target: /var/log/grafana
+    extra_hosts:
+      - "mbsdjenkins:192.168.77.111"
+      - "cortex:172.21.183.244"
+      - "loki:172.21.183.244"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
