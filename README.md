@@ -10,3 +10,4 @@
   * cassandra: Cassandra server
   * mosquitto: Mosquitto MQTT broker
   * grafana: Grafana visual dashboard
+  * loki: Grafana Loki logging stack

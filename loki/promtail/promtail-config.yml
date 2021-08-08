@@ -1,0 +1,75 @@
+server:
+  # disable: true
+  http_listen_address: 0.0.0.0
+  http_listen_port: 9080
+  grpc_listen_port: 9095
+
+positions:
+  filename: /root/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    tenant_id: mylocal
+    external_labels:
+      sitename: mylocal
+      source: promtail
+
+scrape_configs:
+# - job_name: system
+#   pipeline_stages:
+#   static_configs:
+#   - labels:
+#       job: alternatives
+#       __path__: /var/log/alternatives.log
+# - job_name: dpkg
+#   pipeline_stages:
+#   static_configs:
+#   - labels:
+#       job: dpkg
+#       __path__: /var/log/dpkg.log
+# - job_name: syslog
+#   pipeline_stages:
+#   static_configs:
+#   - labels:
+#       job: syslog
+#       __path__: /home/test-logs/syslog
+# - job_name: auth
+#   pipeline_stages:
+#   static_configs:
+#   - labels:
+#       job: auth
+#       __path__: /home/test-logs/auth.log
+# - job_name: docker
+#   pipeline_stages:
+#   static_configs:
+#   - labels:
+#       job: docker
+#       __path__: /home/test-logs/docker.log
+- job_name: apache
+  pipeline_stages:
+  # - regex:
+  #     expression: "^(?P<ip>\\S+) (?P<identd>\\S+) (?P<user>\\S+) \\[(?P<timestamp>[\\w:/]+\\s[+\\-]\\d{4})\\] \"(?P<action>\\S+)\\s?(?P<path>\\S+)?\\s?(?P<protocol>\\S+)?\" (?P<status_code>\\d{3}|-) (?P<size>\\d+|-)\\s?\"?(?P<referer>[^\"]*)\"?\\s?\"?(?P<useragent>[^\"]*)?\"?$"
+  # - labels:
+  #     action:
+  #     status_code:
+  static_configs:
+  - labels:
+      job: apache
+      __path__: /home/test-logs/apache.log
+- job_name: localtest
+  pipeline_stages:
+  # - regex:
+  #     expression: "^(?P<ip>\\S+) (?P<identd>\\S+) (?P<user>\\S+) \\[(?P<timestamp>[\\w:/]+\\s[+\\-]\\d{4})\\] \"(?P<action>\\S+)\\s?(?P<path>\\S+)?\\s?(?P<protocol>\\S+)?\" (?P<status_code>\\d{3}|-) (?P<size>\\d+|-)\\s?\"?(?P<referer>[^\"]*)\"?\\s?\"?(?P<useragent>[^\"]*)?\"?$"
+  # - labels:
+  #     action:
+  #     status_code:
+  static_configs:
+  - labels:
+      job: localtest
+      __path__: /home/test-logs/test.log
+  # - targets:
+  #   - localhost
+  #   labels:
+  #     job: varlogs
+  #     __path__: /home/test-logs/*log
+  #     # __path__: /var/log/*log

@@ -1,0 +1,28 @@
+version: "3.8"
+
+networks:
+  lokinet:
+
+services:
+  loki:
+    image: grafana/loki:2.3.0
+    ports:
+      - '3100:3100'
+    volumes:
+      - type: bind
+        source: ${PWD}/config/loki-config.yml
+        # source: ${PWD}/config/loki-config-aws.yml
+        # source: ${PWD}/config/loki-config-azure.yml
+        target: /etc/loki/local-config.yaml
+      - type: bind
+        source: ${PWD}/config/rules
+        target: /home/loki/rules
+    networks:
+      - lokinet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    command:
+      - -config.file=/etc/loki/local-config.yaml

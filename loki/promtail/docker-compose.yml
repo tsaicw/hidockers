@@ -1,0 +1,32 @@
+version: "3.8"
+
+networks:
+  lokinet:
+
+services:
+  promtail:
+    image: grafana/promtail:2.3.0
+    ports:
+      - '9080:9080'
+    volumes:
+      - type: bind
+        source: ${PWD}/promtail-config.yml
+        target: /etc/promtail/config.yml
+      - type: bind
+        source: /var/log
+        target: /var/log
+      - type: bind
+        source: ${PWD}/test-logs
+        target: /home/test-logs
+    networks:
+      - lokinet
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    extra_hosts:
+      - "loki:172.21.183.244"
+    command:
+      - -config.expand-env=true
+      - -config.file=/etc/promtail/config.yml
