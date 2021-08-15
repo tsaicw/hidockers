@@ -1,4 +1,5 @@
-FROM jenkins/jenkins:lts-slim
+ARG JENKINS_VERSION=lts-slim
+FROM jenkins/jenkins:$JENKINS_VERSION
 LABEL maintainer="galoistsai@gmail.com"
 
 USER root
@@ -20,13 +21,31 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - > /d
 
 USER jenkins
 # Install jenkins plugins
-RUN jenkins-plugin-cli --plugins ansicolor:1.0.0 \
-                                 blueocean:1.24.8 \
-                                 cloudbees-disk-usage-simple:0.10 \
-                                 git:4.8.1 \
-                                 github-branch-source:2.11.2 \
-                                 gitlab-plugin:1.5.20 \
-                                 metrics:4.0.2.8 \
-                                 Office-365-Connector:4.15.0 \
-                                 prometheus:2.0.10 \
-                                 slack:2.48
+RUN jenkins-plugin-cli --plugins \
+        ansible \
+        ansicolor \
+        blueocean \
+        cloudbees-disk-usage-simple \
+        configuration-as-code \
+        credentials \
+        credentials-binding \
+        docker-commons \
+        docker-plugin \
+        docker-workflow \
+        git \
+        git-parameter \
+        github \
+        github-branch-source \
+        gitlab-plugin \
+        htmlpublisher \
+        http_request \
+        junit \
+        metrics \
+        Office-365-Connector \
+        prometheus \
+        publish-over-ssh \
+        rebuild \
+        s3 \
+        slack \
+        ssh \
+        terraform

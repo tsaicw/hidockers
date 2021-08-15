@@ -46,8 +46,8 @@ services:
         source: $PWD/volumes/jenkins_home
         target: /var/jenkins_home
       - type: bind
-        source: $PWD/volumes/GitRepo
-        target: /home/GitRepo
+        source: $PWD/volumes/git_repo
+        target: /home/git_repo
       - type: bind
         source: $HOME/.ssh/id_rsa
         target: /var/jenkins_home/.ssh/id_rsa
