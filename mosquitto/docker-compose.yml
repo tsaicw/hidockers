@@ -33,7 +33,4 @@ services:
       #   target: /etc/mosquitto/clients
       - type: volume
         source: data
-        target: /var/lib/mosquitto/
-    command:
-      - --config-file
-      - /etc/mosquitto/mosquitto.conf
+        target: /etc/mosquitto/data

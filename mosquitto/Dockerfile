@@ -2,13 +2,10 @@ FROM alpine:3.14
 
 # Install Mosquitto MQTT broker
 RUN apk add --no-cache mosquitto mosquitto-clients
+RUN mkdir -p /etc/mosquitto/data && chown mosquitto.mosquitto -R /etc/mosquitto/data
 
-COPY ca_certificates /etc/mosquitto/ca_certificates
-COPY certs /etc/mosquitto/certs
+EXPOSE 1883 8883
 
-RUN chown -R mosquitto.mosquitto /etc/mosquitto/certs/*
-
-EXPOSE 1883
-EXPOSE 8883
-
-ENTRYPOINT ["/usr/sbin/mosquitto"]
+COPY entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["--config-file", "/etc/mosquitto/mosquitto.conf"]
