@@ -1,7 +1,8 @@
 #!/bin/sh
 
-if [ -d /etc/mosquitto/certs ]
+if [ -d /home/certs ]
 then
+  cp -R /home/certs /etc/mosquitto/certs
   find /etc/mosquitto/certs/* ! -name README.md | xargs chown mosquitto.mosquitto
 fi
 

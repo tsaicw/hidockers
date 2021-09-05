@@ -27,7 +27,7 @@ services:
       #   target: /etc/mosquitto/ca_certificates
       # - type: bind
       #   source: ${PWD}/certs
-      #   target: /etc/mosquitto/certs
+      #   target: /home/certs
       # - type: bind
       #   source: ${PWD}/clients
       #   target: /etc/mosquitto/clients
