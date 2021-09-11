@@ -1,7 +1,7 @@
 # Alertmanager Docker
 
 ## Environment:
-  * Alertmanager 0.22.x
+  * Alertmanager 0.23.x
 
 ## Usage:
 ```console
