@@ -1,6 +1,6 @@
 version: '3.8'
 volumes:
-  am_data:
+  alertmanager:
 
 networks:
   promnet:
@@ -22,7 +22,7 @@ services:
         source: ${PWD}/config/alertmanager.yml
         target: /etc/alertmanager/alertmanager.yml
       - type: volume
-        source: am_data
+        source: alertmanager
         target: /alertmanager
     deploy:
       replicas: 1

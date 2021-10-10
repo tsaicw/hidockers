@@ -4,15 +4,20 @@ networks:
 
 services:
   promteams:
-    image: quay.io/prometheusmsteams/prometheus-msteams
+    image: quay.io/prometheusmsteams/prometheus-msteams:v1.5.0
     hostname: promteams
     networks:
       promnet:
     ports:
       - '2000:2000'
     environment:
+      - CONFIG_FILE=/root/config.yml
       # - TEAMS_INCOMING_WEBHOOK_URL=
-      - TEAMS_REQUEST_URI=alertmanager
+      # - TEAMS_REQUEST_URI=alertmanager
+    volumes:
+      - type: bind
+        source: ${PWD}/prometheus-msteams/config.yml
+        target: /root/config.yml
     deploy:
       replicas: 1
       restart_policy:

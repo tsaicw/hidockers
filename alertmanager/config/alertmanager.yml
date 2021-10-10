@@ -1,19 +1,12 @@
 global:
   # resolve_timeout: 5m
 
-  # Dlink Office365
-  smtp_smarthost: 'smtp.office365.com:587'
-  smtp_auth_username: 'decsglobal@dlinkcorp.com'
+  # Amazon SES
+  smtp_smarthost: 'email-smtp.us-east-1.amazonaws.com:587'
+  smtp_auth_username: ''
   smtp_auth_password: ''
   smtp_require_tls: true
-  smtp_from: 'decsglobal@dlinkcorp.com'
-
-  # Amazon SES
-  # smtp_smarthost: 'email-smtp.us-east-1.amazonaws.com:587'
-  # smtp_auth_username: ''
-  # smtp_auth_password: ''
-  # smtp_require_tls: true
-  # smtp_from: 'devops@decs.dlink.com'
+  smtp_from: 'devops@decs.dlink.com'
 
   slack_api_url: ''
 
@@ -24,6 +17,14 @@ route:
   group_interval: 5m
   repeat_interval: 4h
   routes:
+  - receiver: mbsd-notification
+    matchers:
+    - alertname =~ "CPUThreshold|MemoryThreshold"
+    routes:
+    - receiver: global-production-ops-notification
+      matchers:
+      - sitename = portal
+      - canonicalname = deu-prod
   - receiver: global-production-ops
     matchers:
     - sitename = portal
@@ -31,18 +32,10 @@ route:
   - receiver: global-staging-ops
     matchers:
     - sitename = global-staging
-  - receiver: mbsd-devops
-    matchers:
-    - alertname = JenkinsDown
+    - canonicalname = deu-staging
   - receiver: mbsd-notification
     matchers:
     - alertname = InstanceDown
-  - receiver: mbsd-notification
-    matchers:
-    - alertname = CPUThreshold
-  - receiver: mbsd-notification
-    matchers:
-    - alertname = MemoryThreshold
   - receiver: pagerduty_test
     matchers:
     - alertname = PagerDuty Test
@@ -57,9 +50,6 @@ receivers:
   #   send_resolved: true
 
 - name: global-production-ops
-  # webhook_configs:
-  # - url: 'http://promteams:2000/alertmanager'
-  #   send_resolved: true
   pagerduty_configs:
   - service_key: '' # Global-Production D-ECS
     send_resolved: false
@@ -67,10 +57,15 @@ receivers:
   # - to: 'MBSD@dlink.com.tw'
   #   send_resolved: true
 
-- name: global-staging-ops
-  # webhook_configs:
-  # - url: 'http://promteams:2000/alertmanager'
+- name: global-production-ops-notification
+  webhook_configs:
+  - url: 'http://promteams:2000/d_ecs_portal'
+    send_resolved: true
+  # email_configs:
+  # - to: 'MBSD@dlink.com.tw'
   #   send_resolved: true
+
+- name: global-staging-ops
   pagerduty_configs:
   - service_key: '' # Global-Staging D-ECS
     send_resolved: false
@@ -80,7 +75,7 @@ receivers:
   - to: 'MBSD@dlink.com.tw'
     send_resolved: true
   webhook_configs:
-  - url: 'http://promteams:2000/alertmanager'
+  - url: 'http://promteams:2000/mbsd_devops'
     send_resolved: true
   slack_configs:
   - channel: '#dlink-mbsd-devops'
