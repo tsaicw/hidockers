@@ -1,0 +1,78 @@
+version: '3.8'
+
+networks:
+  rdnet:
+
+volumes:
+  dbdata:
+
+services:
+  rundeck:
+    image: galoistsai/rundeck:${RUNDECK_VERSION}
+    build:
+      context: rundeck
+      args:
+        RUNDECK_IMAGE: ${RUNDECK_IMAGE}
+    hostname: rundeck
+    restart: always
+    networks:
+      rdnet:
+    ports:
+      - '4440:4440'
+    volumes:
+      - type: bind
+        source: ${HOME}/.ssh
+        target: /home/rundeck/.ssh
+      - type: bind
+        source: ${HOME}/.azure
+        target: /home/rundeck/.azure
+      - type: bind
+        source: ${PWD}/node_source
+        target: /home/rundeck/node_source
+      # - type: bind
+      #   source: ${ANSIBLE_PATH}
+      #   target: /home/rundeck/ansible
+      - type: bind
+        source: ${PWD}/configs/realm.properties
+        target: /home/rundeck/server/config/realm.properties
+      - type: bind
+        source: ${PWD}/configs/mbsd.aclpolicy
+        target: /home/rundeck/etc/mbsd.aclpolicy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    environment:
+      RUNDECK_GRAILS_URL: ${GRAILS_URL}
+      RUNDECK_SERVER_ADDRESS: ${SERVER_ADDRESS}
+      RUNDECK_SERVER_CONTEXTPATH: ${SERVER_CONTEXTPATH}
+      RUNDECK_SERVER_FORWARDED: ${SERVER_FORWARDED}
+      RUNDECK_DATABASE_URL: ${DATABASE_URL}
+      RUNDECK_DATABASE_DRIVER: ${DATABASE_DRIVER}
+      RUNDECK_DATABASE_USERNAME: ${DATABASE_USERNAME}
+      RUNDECK_DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      RUNDECK_JAAS_MODULES_0: PropertyFileLoginModule
+      RUNDECK_JAAS_FILE_FLAG: required
+
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:13}
+    hostname: postgres
+    restart: always
+    networks:
+      rdnet:
+    # ports:
+    #   - '5432:5432'
+    volumes:
+      - type: volume
+        source: dbdata
+        target: /var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}

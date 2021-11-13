@@ -1,0 +1,21 @@
+jenkins:
+  nodename: MBSDJenkins
+  hostname: lab.decs.dlink.com:40000
+  osFamily: GNU/Linux
+  osName: Ubuntu
+  osArch: x86_64
+  osVersion: 5.11.0-36-generic
+  description: Jenkins in MBSD Lab
+  username: daniel
+  tags: mbsd,lab,jenkins
+
+azansible:
+  nodename: azansible
+  hostname: azansible.decs.dlink.com
+  osFamily: GNU/Linux
+  osName: Ubuntu
+  osArch: x86_64
+  osVersion: 5.4.0-1062-azure
+  description: Annsible and Rundeck
+  username: devops
+  tags: mbsd,lab,ansible,rundeck

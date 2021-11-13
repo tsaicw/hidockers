@@ -1,0 +1,10 @@
+mbsdedge:
+  nodename: mbsdedge
+  hostname: mbsdedge-dev.decs.dlink.com
+  osFamily: GNU/Linux
+  osName: Ubuntu
+  osArch: x86_64
+  osVersion: 5.4.0-1062-azure
+  description: NBSDEdge development site
+  username: decs
+  tags: mbsd,mbsdedge,decs

@@ -12,3 +12,4 @@
   * grafana: Grafana visual dashboard
   * loki: Grafana Loki logging stack
   * alertmanager: Prometheus Alertmanager
+  * rundeck: Rundeck Automation
