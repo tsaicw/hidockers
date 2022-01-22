@@ -1,0 +1,21 @@
+listen: 0.0.0.0:9010
+# Profiling API, remove to disable
+# listen_pprof: 0.0.0.0:7008
+target: http://cortex:80/api/v1/push
+log_level: warn
+timeout: 10s
+
+# Timeout to wait on shutdown to allow load balancers detect that we're going away.
+# During this period after the shutdown command the /alive endpoint will reply with HTTP 503.
+# Set to 0s to disable.
+# timeout_shutdown: 10s
+
+# Max number of parallel incoming HTTP requests to handle
+# concurrency: 10
+
+tenant:
+  label: __tenant__
+  label_remove: true
+  header: X-Scope-OrgID
+  default: default
+  # accept_all: false

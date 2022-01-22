@@ -1,0 +1,89 @@
+version: '3.8'
+
+networks:
+  cortex:
+
+volumes:
+  consul_config:
+  consul_data:
+
+services:
+  consul:
+    image: consul:${CONSUL_VERSION}
+    hostname: consul
+    restart: always
+    networks:
+      cortex:
+    # ports:
+    #   - '8500:8500'
+    volumes:
+      - type: volume
+        source: consul_config
+        target: /consul/config
+      - type: volume
+        source: consul_data
+        target: /consul/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      restart_policy:
+        condition: any
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+    command:
+      - agent
+      - -server
+      - -datacenter=cortex
+      - -bootstrap-expect=1
+      - -client=0.0.0.0
+      - -ui
+      - -data-dir=/consul/data
+      - -config-dir=/consul/config
+
+  cortex:
+    image: cortexproject/cortex:${CORTEX_VERSION}
+    hostname: cortex
+    restart: always
+    networks:
+      cortex:
+    ports:
+      - '9001:80'
+    volumes:
+      - type: bind
+        source: ${PWD}/config/cortex-config.yml
+        target: /etc/cortex-config.yml
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    command:
+      - -config.file=/etc/cortex-config.yml
+
+  cortex-tenant:
+    image: vincentfree/cortex-tenant:${CORTEX_TENANT_VERSION}
+    hostname: cortex-tenant
+    networks:
+      cortex:
+    ports:
+      - '9010:9010'
+    volumes:
+      - type: bind
+        source: ${PWD}/config/cortex-tenant.yml
+        target: /data/cortex-tenant.yml
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "5"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any

@@ -1,0 +1,140 @@
+target: all
+
+auth_enabled: true
+
+server:
+  http_listen_port: 80
+  grpc_listen_port: 9095
+  grpc_server_max_recv_msg_size: 104857600
+  grpc_server_max_send_msg_size: 104857600
+  grpc_server_max_concurrent_streams: 1000
+
+limits:
+  accept_ha_samples: true
+
+distributor:
+  shard_by_all_labels: true
+  pool:
+    client_cleanup_period: 15s
+    health_check_ingesters: true
+  ha_tracker:
+    enable_ha_tracker: true
+    kvstore:
+      store: consul
+      prefix: ha-tracker/
+      consul:
+        host: consul:8500
+  ring:
+    kvstore:
+      store: consul
+      prefix: collectors/
+      consul:
+        host: consul:8500
+
+ingester_client:
+  grpc_client_config:
+    max_recv_msg_size: 104857600
+    max_send_msg_size: 104857600
+    grpc_compression: gzip
+
+ingester:
+  lifecycler:
+    join_after: 10s
+    observe_period: 10s
+    min_ready_duration: 0s
+    final_sleep: 5s
+    num_tokens: 512
+    ring:
+      kvstore:
+        store: consul
+        prefix: collectors/
+        consul:
+          host: consul:8500
+      replication_factor: 1
+
+storage:
+  engine: blocks
+
+blocks_storage:
+  tsdb:
+    dir: /cortex/tsdb
+  bucket_store:
+    sync_dir: /cortex/tsdb-sync
+  # backend: s3
+  # s3:
+  #   bucket_name: mbsd-cortex
+  #   endpoint: s3.dualstack.us-east-1.amazonaws.com
+  #   # Configure your S3 credentials below.
+  #   secret_access_key:
+  #   access_key_id:
+  # backend: azure
+  # azure:
+  #   account_name: sambsdinfradev
+  #   account_key:
+  #   container_name: cortex
+  #   endpoint_suffix: blob.core.windows.net
+  #   max_retries: 20
+  backend: filesystem
+  filesystem:
+    dir: /cortex/lts/tsdb
+  # metadata_cache:
+  #   backend: memcached
+  #   memcached:
+  #     addresses: ''
+
+querier:
+  active_query_tracker_dir: /cortex/active-query-tracker
+
+compactor:
+  data_dir: /cortex/compactor
+  sharding_enabled: true
+  sharding_ring:
+    kvstore:
+      store: consul
+      prefix: collectors/
+      consul:
+        host: consul:8500
+
+store_gateway:
+  sharding_enabled: true
+  sharding_ring:
+    kvstore:
+      store: consul
+      prefix: collectors/
+      consul:
+        host: consul:8500
+
+frontend_worker:
+  match_max_concurrent: true
+
+ruler:
+  enable_api: true
+  # external_url:
+  enable_sharding: true
+  ring:
+    kvstore:
+      store: consul
+      prefix: rulers/
+      consul:
+        host: consul:8500
+
+ruler_storage:
+  backend: filesystem
+  filesystem:
+    dir: /cortex/rules
+
+alertmanager:
+  data_dir: /cortex/alertmanager
+  external_url: alertmanager
+  sharding_enabled: false
+  sharding_ring:
+    kvstore:
+      store: consul
+      prefix: alertmanagers/
+      consul:
+        host: consul:8500
+
+alertmanager_storage:
+  backend: filesystem
+  filesystem:
+    dir: /cortex/alertmanager

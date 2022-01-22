@@ -10,6 +10,7 @@
   * cassandra: Cassandra server
   * mosquitto: Mosquitto MQTT broker
   * grafana: Grafana visual dashboard
+  * cortex: Grafana Cortex monitoring stack
   * loki: Grafana Loki logging stack
   * alertmanager: Prometheus Alertmanager
   * rundeck: Rundeck Automation

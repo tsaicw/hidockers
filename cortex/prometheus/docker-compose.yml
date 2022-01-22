@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  exporter:
+    image: prom/node-exporter
+    hostname: GreenIsland
+    restart: always
+    ports:
+    - "9100:9100"
+    volumes:
+    - type: bind
+      source: /proc
+      target: /host/proc
+    - type: bind
+      source: /sys
+      target: /host/sys
+    - type: bind
+      source: /
+      target: /rootfs
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.filesystem.ignored-mount-points
+      - "^/(sys|proc|dev|host|etc)($$|/)"
+
+  prom1:
+    image: prom/prometheus:v2.32.1
+    hostname: prom1
+    restart: always
+    ports:
+      - '9090:9090'
+    volumes:
+      - type: bind
+        source: ${PWD}/prom-config-1.yml
+        target: /etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "cortex:${CONSUL_HOST}"
+      - "GreenIsland:${CONSUL_HOST}"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    command:
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --storage.tsdb.retention.time=1w
+
+  prom2:
+    image: prom/prometheus:v2.32.1
+    hostname: prom2
+    restart: always
+    ports:
+      - '9091:9090'
+    volumes:
+      - type: bind
+        source: ${PWD}/prom-config-2.yml
+        target: /etc/prometheus/prometheus.yml
+    extra_hosts:
+      - "cortex:${CONSUL_HOST}"
+      - "GreenIsland:${CONSUL_HOST}"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+    command:
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+      - --storage.tsdb.retention.time=1w
+
+  grafana:
+    image: grafana/grafana:8.3.3
+    hostname: grafana
+    restart: always
+    ports:
+      - '3000:3000'
+    extra_hosts:
+      - "cortex:${CONSUL_HOST}"
+      - "prom1:${CONSUL_HOST}"
+      - "prom2:${CONSUL_HOST}"
