@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:1.21-alpine
+    hostname: nginx
+    restart: always
+    ports:
+      - "8080:80"
+    logging:
+      driver: loki
+      options:
+        loki-url: http://172.17.206.23:3100/loki/api/v1/push
+        loki-tenant-id: MyWeb
+        # loki-retries: 5
+        # loki-batch-size: 400
+        loki-external-labels: "job=docker,container_name={{.Name}}"
+        max-size: "5m"
+        max-file: "30"
+    # environment:
+    #   myenv: "MYENV"
+    # env_file:
+    #   - a.env
+    # labels:
+    #   site_name: global-staging
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+
+  grafana:
+    image: grafana/grafana:8.3.3
+    hostname: grafana
+    restart: always
+    ports:
+      - '3000:3000'
+    extra_hosts:
+      - "loki:${CONSUL_HOST}"

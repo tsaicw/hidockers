@@ -14,8 +14,8 @@ services:
     restart: always
     networks:
       loki:
-    ports:
-      - '8600:8500'
+    # ports:
+    #   - '8500:8500'
     volumes:
       - type: volume
         source: consul_config
@@ -43,9 +43,9 @@ services:
       - -data-dir=/consul/data
       - -config-dir=/consul/config
 
-  distributor:
+  loki_write:
     image: grafana/loki:2.4.2
-    hostname: distributor
+    hostname: loki_write
     restart: always
     networks:
       loki:
@@ -66,66 +66,16 @@ services:
         condition: any
     command:
       - -config.file=/etc/loki-config.yml
-      - -target=distributor
+      - -target=write
 
-  ingester:
+  loki_read:
     image: grafana/loki:2.4.2
-    hostname: ingester
+    hostname: loki_read
     restart: always
     networks:
       loki:
     ports:
       - '3101:3100'
-    volumes:
-      - type: bind
-        source: ${PWD}/config/loki-config.yml
-        target: /etc/loki-config.yml
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-    command:
-      - -config.file=/etc/loki-config.yml
-      - -target=ingester
-
-  compactor:
-    image: grafana/loki:2.4.2
-    hostname: compactor
-    restart: always
-    networks:
-      loki:
-    ports:
-      - '3102:3100'
-    volumes:
-      - type: bind
-        source: ${PWD}/config/loki-config.yml
-        target: /etc/loki-config.yml
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "5"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-    command:
-      - -config.file=/etc/loki-config.yml
-      - -target=compactor
-
-  querier:
-    image: grafana/loki:2.4.2
-    hostname: querier
-    restart: always
-    networks:
-      loki:
-    ports:
-      - '3103:3100'
     volumes:
       - type: bind
         source: ${PWD}/config/loki-config.yml

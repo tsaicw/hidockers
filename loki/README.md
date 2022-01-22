@@ -1,7 +1,7 @@
 # Grafana Loki Docker
 
 ## Environment:
-  * Grafana Loki 2.3.x
+  * Grafana Loki 2.4.x
 
 ## Usage:
 ```console
