@@ -1,0 +1,122 @@
+version: '3.8'
+
+networks:
+  gitlab:
+
+volumes:
+  # GitLab
+  config:
+  logs:
+  data:
+  # GitLab runner
+  alpine_config:
+  alpine_home:
+  ubuntu_config:
+  ubuntu_home:
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ee:15.0.3-ee.0
+    restart: always
+    hostname: gitlab.ocarina.idv
+    networks:
+      gitlab:
+    ports:
+    - '80:80'
+    - '443:443'
+    - '${GITLAB_SSH_PORT}:22'
+    - '5000:5000'
+    - '5050:5050'
+    volumes:
+    - type: volume
+      source: config
+      target: /etc/gitlab
+    - type: volume
+      source: logs
+      target: /var/log/gitlab
+    - type: volume
+      source: data
+      target: /var/opt/gitlab
+    - type: bind
+      source: ${PWD}/ssl
+      target: /etc/gitlab/ssl
+      read_only: true
+    shm_size: 256m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url '${GITLAB_EXTERNAL_URL}'
+        gitlab_rails['gitlab_shell_ssh_port'] = '${GITLAB_SSH_PORT}'
+        # Container Registry
+        gitlab_rails['registry_enabled'] = '${REGISTRY_ENABLED}'
+        registry_external_url '${REGISTRY_EXTERNAL_URL}'
+        gitlab_rails['registry_host'] = '${REGISTRY_HOST}'
+        gitlab_rails['registry_port'] = '${REGISTRY_PORT}'
+        registry_nginx['enable'] = '${REGISTRY_ENABLED}'
+        # SMTP
+        gitlab_rails['smtp_enable'] = true
+        gitlab_rails['smtp_address'] = "smtp.gmail.com"
+        gitlab_rails['smtp_port'] = 587
+        gitlab_rails['smtp_user_name'] = "daniel.cw.tsai@gmail.com"
+        gitlab_rails['smtp_password'] = ""
+        gitlab_rails['smtp_domain'] = "smtp.gmail.com"
+        gitlab_rails['smtp_authentication'] = "login"
+        gitlab_rails['smtp_enable_starttls_auto'] = true
+        gitlab_rails['smtp_tls'] = false
+        gitlab_rails['smtp_pool'] = false
+        gitlab_rails['smtp_openssl_verify_mode'] = 'peer'
+
+  # GitLab runner
+  alpine-runner:
+    image: gitlab/gitlab-runner:alpine3.15-v15.0.0
+    restart: always
+    networks:
+      gitlab:
+    volumes:
+    - type: volume
+      source: alpine_config
+      target: /etc/gitlab-runner
+    - type: volume
+      source: alpine_home
+      target: /home/gitlab-runner
+    - type: bind
+      source: ${PWD}/ssl
+      target: /etc/gitlab-runner/certs
+      read_only: true
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  ubuntu-runner:
+    image: gitlab/gitlab-runner:ubuntu-v15.0.0
+    restart: always
+    networks:
+      gitlab:
+    volumes:
+    - type: volume
+      source: ubuntu_config
+      target: /etc/gitlab-runner
+    - type: volume
+      source: ubuntu_home
+      target: /home/gitlab-runner
+    - type: bind
+      source: ${PWD}/ssl
+      target: /etc/gitlab-runner/certs
+      read_only: true
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"

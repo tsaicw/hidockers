@@ -4,13 +4,14 @@
   * ansible: Environment of Ansible
   * gcc: Environment of GNU C
   * jdk: Environment of Java SE Development Kit
-  * jenkins: Jenkins server
+  * cassandra: Cassandra server
   * dynamodb: Amazon DynamoDB server
   * mongodb: MongoDB server
-  * cassandra: Cassandra server
   * mosquitto: Mosquitto MQTT broker
+  * alertmanager: Prometheus Alertmanager
   * grafana: Grafana visual dashboard
   * cortex: Grafana Cortex monitoring stack
   * loki: Grafana Loki logging stack
-  * alertmanager: Prometheus Alertmanager
   * rundeck: Rundeck Automation
+  * gitlab: GitLab DevOps platform
+  * jenkins: Jenkins server
