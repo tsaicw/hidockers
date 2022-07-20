@@ -1,0 +1,28 @@
+version: '3.8'
+
+networks:
+  devops:
+  outside:
+    external: true
+    name: host
+
+services:
+  nginx:
+    image: nginx:1.23-alpine
+    networks:
+      # outside:
+      devops:
+    ports:
+    - "80:80"
+    - '8888:443'
+    volumes:
+    - type: bind
+      source: ${PWD}/nginx.conf
+      target: /etc/nginx/nginx.conf
+    - type: bind
+      source: ${PWD}/conf.d
+      target: /etc/nginx/conf.d
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any

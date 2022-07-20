@@ -1,7 +1,7 @@
 # Grafana Docker
 
 ## Environment:
-  * Grafana 8.2.x
+  * Grafana 9.0.x
 
 ## Usage:
 ```console

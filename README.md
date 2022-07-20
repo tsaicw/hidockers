@@ -8,6 +8,7 @@
   * dynamodb: Amazon DynamoDB server
   * mongodb: MongoDB server
   * mosquitto: Mosquitto MQTT broker
+  * nginx: Nginx server
   * alertmanager: Prometheus Alertmanager
   * grafana: Grafana visual dashboard
   * cortex: Grafana Cortex monitoring stack
