@@ -1,0 +1,25 @@
+ARG DISTRO_VERSION=3.17
+FROM alpine:${DISTRO_VERSION} as build
+
+WORKDIR /root
+
+RUN apk update \
+    && apk upgrade \
+    && apk add git make gcc g++ cmake linux-headers lksctp-tools-dev
+
+RUN git clone https://github.com/aligungr/UERANSIM && \
+    cd UERANSIM && \
+    make
+
+
+FROM alpine:${DISTRO_VERSION}
+
+WORKDIR /root/ueransim
+
+RUN apk update \
+    && apk upgrade \
+    && apk add libgcc libstdc++ lksctp-tools iproute2 \
+    && rm -rf /var/cache/apk/*
+
+COPY --from=build /root/UERANSIM/build /root/ueransim/bin
+COPY --from=build /root/UERANSIM/config /root/ueransim/config

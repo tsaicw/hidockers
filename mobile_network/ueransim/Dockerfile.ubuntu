@@ -1,0 +1,25 @@
+ARG DISTRO_VERSION=22.04
+FROM ubuntu:${DISTRO_VERSION} as build
+
+WORKDIR /root
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y git make gcc g++ cmake libsctp-dev
+
+RUN git clone https://github.com/aligungr/UERANSIM && \
+    cd UERANSIM && \
+    make
+
+
+FROM ubuntu:${DISTRO_VERSION}
+
+WORKDIR /root/ueransim
+
+RUN apt-get update \
+    && apt-get upgrade -y \
+    && apt-get install -y lksctp-tools iproute2 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /root/UERANSIM/build /root/ueransim/bin
+COPY --from=build /root/UERANSIM/config /root/ueransim/config
