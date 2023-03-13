@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  open5gs:
+    image: open5gs:latest
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    cap_add:
+    - NET_ADMIN
+    devices:
+    - "/dev/net/tun"
+    sysctls:
+      net.ipv6.conf.all.disable_ipv6: 0
+    ports:
+    - 38413:38413
+    - 2152:2152

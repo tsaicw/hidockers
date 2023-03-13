@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Default values
+IMSI_COUNT=10
+IMSI=999700000000000
+KEY=465B5CE8B199B49FAA5F0A2EE238A6BC
+OPC=E8ED289DEBA952E4283B54E88E6183CA
+
+usage() {
+  echo "Usage: $0 [-c <count>] [-i <imsi>] [-k <key>] [-o <opc>]" 1>&2
+  exit 1
+}
+
+while getopts "c:i:k:o:" option; do
+  case "${option}" in
+    c)
+      IMSI_COUNT=${OPTARG}
+      ;;
+    i)
+      IMSI=${OPTARG}
+      ;;
+    k)
+      KEY=${OPTARG}
+      ;;
+    o)
+      OPC=${OPTARG}
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+shift $(($OPTIND - 1))
+
+for ((i = 1; i <= ${IMSI_COUNT}; i++)); do
+  echo "Add subscriber $((IMSI + i))"
+  open5gs-dbctl add $((IMSI + i)) ${KEY} ${OPC}
+done
