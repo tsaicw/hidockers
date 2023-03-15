@@ -1,0 +1,21 @@
+#!/bin/bash
+
+declare -A SUPPORTED_DISTRO=([alpine]=1 [ubuntu]=1)
+DISTRO=alpine
+
+if [ -n "${SUPPORTED_DISTRO[${1:-not_supported}]}" ]; then
+  DISTRO=${1}
+fi
+
+if [ -n "$(docker container ls --filter name=ueransim-${DISTRO} --quiet)" ]; then
+  echo -e "\e[32mAttach to \e[33mueransim-${DISTRO} \e[32mcontainer\e[39m"
+  docker container attach ueransim-${DISTRO}
+else
+  echo -e "\e[32mStart \e[33mueransim-${DISTRO} \e[32mcontainer\e[39m"
+  docker container run --rm -it \
+                       --name ueransim-${DISTRO} \
+                       --hostname ueransim-${DISTRO} \
+                       --cap-add NET_ADMIN \
+                       --device /dev/net/tun \
+                       ueransim:${DISTRO}
+fi
