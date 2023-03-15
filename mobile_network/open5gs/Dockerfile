@@ -7,10 +7,10 @@ ENV IPV6_TUN_ADDR=cafe::1/64
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y lsb-release curl wget gnupg iproute2 software-properties-common && \
+    apt-get install -y lsb-release curl gnupg iproute2 iptables software-properties-common && \
 # Mongodb
-    wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add - && \
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
+    curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | gpg --dearmor -o /etc/apt/keyrings/mongodb.gpg && \
+    echo "deb [ arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
     apt-get update && \
     apt-get install -y mongodb-org && \
 # Open5GS

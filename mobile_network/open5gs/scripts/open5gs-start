@@ -2,12 +2,10 @@
 
 SERVICES=(amf ausf bsf hss mme nrf nssf pcf pcrf scp sgwc sgwu smf udm udr upf)
 
-AMF_NGAP_ADDR=127.0.0.5
-UPF_GTPU_ADDR=127.0.0.7
-
 function mongodb_start {
   if [ $(ps aux | grep mongod | grep -v grep | wc -l) -eq 0 ]; then
     /usr/bin/mongod --config /etc/mongod.conf &
+    echo -e "\e[92mWait for MongoDB server startup ...\n\e[39m"
     sleep 5
   fi
 }
@@ -15,7 +13,7 @@ function mongodb_start {
 # tun iface create
 function tun_create {
   if ! grep "ogstun" /proc/net/dev > /dev/null; then
-    echo "Creating ogstun device"
+    echo -e "\e[92mCreating \e[93mogstun \e[92mdevice\n\e[39m"
     ip tuntap add name ogstun mode tun
   fi
 
@@ -29,22 +27,29 @@ function tun_create {
   ip link set ogstun up
 
   # sysctl -w net.ipv4.ip_forward=1
-  # if [ "${ENABLE_NAT}" = true ] ; then
-  #   iptables -t nat -A POSTROUTING -s ${IPV4_TUN_SUBNET} ! -o ogstun -j MASQUERADE;
-  # fi
+  if [ "${ENABLE_NAT}" = true ] ; then
+    iptables -t nat -A POSTROUTING -s ${IPV4_TUN_SUBNET} ! -o ogstun -j MASQUERADE
+  fi
+}
+
+function open5gs_config {
+  # AMF
+  sed -i -e '/^\ \ \ \ ngap:/,/^\ \ \ \ metrics:/{/- addr/d}' /etc/open5gs/amf.yaml
+
+  #UPF
+  sed -i -e '/^\ \ \ \ gtpu:/,/^\ \ \ \ subnet:/{/- addr/d}' /etc/open5gs/upf.yaml
 }
 
 function open5gs_start {
-  #
-  # TODO: Customize the address of amf ngap and upf gtpu
-  #
+  open5gs_config
 
+  echo -e "\e[92mStart Open5GS services\e[39m"
   for service in ${SERVICES[@]}; do
-    echo "Start ${service}"
     /usr/bin/open5gs-${service}d -c /etc/open5gs/${service}.yaml &
   done
 }
 
 tun_create
 mongodb_start
+
 open5gs_start

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+export NODE_ENV=production
+
+# Fix the /etc/hosts: remove the localhost from ::1
+sed -e "s/\(::1\t\)localhost\ /\\1/g" /etc/hosts > /tmp/hosts
+cp /tmp/hosts /etc/hosts
+
+# Install NodeJS
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+apt-get install -y nodejs
+
+# Install WebUI of Open5GS
+curl -fsSL https://open5gs.org/open5gs/assets/webui/install | bash -
