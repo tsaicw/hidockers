@@ -19,4 +19,7 @@ RUN apt-get update && \
     apt-get install -y open5gs && \
     rm -rf /var/lib/apt/lists/*
 
+# yq: a lightweight and portable command-line YAML, JSON and XML processor
+RUN curl -Ls https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq && chmod +x /usr/local/bin/yq
+
 COPY scripts/ /usr/local/bin

@@ -14,6 +14,7 @@ else
                        --sysctl 'net.ipv4.ip_forward=1' \
                        --env ENABLE_NAT=true \
                        --env NODE_ENV=production \
+                       --env UPF_GTPU_ADVERTISE= \
                        --publish 38412:38412/sctp \
                        --publish 2152:2152/udp \
                        open5gs

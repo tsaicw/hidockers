@@ -13,5 +13,5 @@
 * Run it
   ```console
   docker container run --rm -it --cap-add NET_ADMIN --device /dev/net/tun open5gs
-  docker-compose run --rm open5gs
+  docker-compose run --rm --service-ports open5gs
   ```

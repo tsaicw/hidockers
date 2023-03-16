@@ -1,6 +1,8 @@
 #!/bin/bash
 
+OPEN5GS_CONFIG_PATH=/etc/open5gs
 SERVICES=(amf ausf bsf hss mme nrf nssf pcf pcrf scp sgwc sgwu smf udm udr upf)
+
 
 function mongodb_start {
   if [ $(ps aux | grep mongod | grep -v grep | wc -l) -eq 0 ]; then
@@ -33,11 +35,18 @@ function tun_create {
 }
 
 function open5gs_config {
-  # AMF
-  sed -i -e '/^\ \ \ \ ngap:/,/^\ \ \ \ metrics:/{/- addr/d}' /etc/open5gs/amf.yaml
+  ETH0_IPADDR=$(ip -br addr show dev eth0 | awk '{print $3}' | cut -d'/' -f1)
 
-  #UPF
-  sed -i -e '/^\ \ \ \ gtpu:/,/^\ \ \ \ subnet:/{/- addr/d}' /etc/open5gs/upf.yaml
+  if [ -n "${ETH0_IPADDR}" ]; then
+    # AMF
+    yq -i ".amf.ngap[0].addr = \"${ETH0_IPADDR}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+
+    # UPF
+    yq -i ".upf.gtpu[0].addr = \"${ETH0_IPADDR}\"" ${OPEN5GS_CONFIG_PATH}/upf.yaml
+    if [ -n "${UPF_GTPU_ADVERTISE}" ]; then
+      yq -i ".upf.gtpu[0].advertise = \"${UPF_GTPU_ADVERTISE}\"" ${OPEN5GS_CONFIG_PATH}/upf.yaml
+    fi
+  fi
 }
 
 function open5gs_start {
@@ -49,6 +58,10 @@ function open5gs_start {
   done
 }
 
+
+#
+# ========== Start from here ==========
+#
 tun_create
 mongodb_start
 

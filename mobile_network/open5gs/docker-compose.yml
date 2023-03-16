@@ -20,3 +20,4 @@ services:
     environment:
       ENABLE_NAT: 'true'
       NODE_ENV: production
+      UPF_GTPU_ADVERTISE:
