@@ -1,0 +1,15 @@
+ARG DISTRO_VERSION=3.17
+FROM alpine:${DISTRO_VERSION}
+
+# Install supervisor
+RUN apk update && \
+    apk upgrade && \
+    apk add supervisor && \
+    rm -rf /var/cache/apk/*
+
+# Copy the configuration file
+# COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY supervisord.conf /etc/supervisord.conf
+
+# Run the process manager
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
