@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  alpine:
+    image: netopeer2:alpine
+    build:
+      context: .
+      dockerfile: ./Dockerfile.alpine
+      args:
+        CMAKE_BUILD_TYPE: Release
+    hostname: np2-alpine
+    command: ash
+
+  ubuntu:
+    image: netopeer2:ubuntu
+    build:
+      context: .
+      dockerfile: ./Dockerfile.ubuntu
+      args:
+        CMAKE_BUILD_TYPE: Release
+    hostname: np2-ubuntu
+    command: bash
