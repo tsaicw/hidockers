@@ -32,9 +32,13 @@ ARG LIBNETCONF2_VERSION=2.1.34
 ARG SYSREPO_VERSION=2.2.73
 ARG NETOPEER2_VERSION=2.1.62
 
-# ARG CMAKE_INSTALL_PREFIX=/usr/local
+WORKDIR /root
+RUN curl -LO https://github.com/CESNET/libyang/archive/refs/tags/v${LIBYANG_VERSION}.tar.gz && \
+    curl -LO https://github.com/CESNET/libnetconf2/archive/refs/tags/v${LIBNETCONF2_VERSION}.tar.gz && \
+    curl -LO https://github.com/sysrepo/sysrepo/archive/refs/tags/v${SYSREPO_VERSION}.tar.gz && \
+    curl -LO https://github.com/CESNET/netopeer2/archive/refs/tags/v${NETOPEER2_VERSION}.tar.gz
+
 ARG CMAKE_INSTALL_PREFIX=/opt/netopeer2
-# ARG CMAKE_BUILD_TYPE=Release
 ARG CMAKE_BUILD_TYPE=Debug
 
 # Arguments of Sysrepo
@@ -52,23 +56,11 @@ ARG ENABLE_DNSSEC=OFF
 # Arguments of Netopeer2
 ARG BUILD_CLI=ON
 
-WORKDIR /root
-
 RUN addgroup ${SYSREPO_GROUP}
-
-RUN curl -LO https://github.com/CESNET/libyang/archive/refs/tags/v${LIBYANG_VERSION}.tar.gz && \
-    curl -LO https://github.com/CESNET/libnetconf2/archive/refs/tags/v${LIBNETCONF2_VERSION}.tar.gz && \
-    curl -LO https://github.com/sysrepo/sysrepo/archive/refs/tags/v${SYSREPO_VERSION}.tar.gz && \
-    curl -LO https://github.com/CESNET/netopeer2/archive/refs/tags/v${NETOPEER2_VERSION}.tar.gz
 
 # Environment variables
 ENV NETOPEER2_PATH=${CMAKE_INSTALL_PREFIX}
 ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib
-
-# RUN tar zxfv v${LIBYANG_VERSION}.tar.gz && \
-#     tar zxfv v${LIBNETCONF2_VERSION}.tar.gz && \
-#     tar zxfv v${SYSREPO_VERSION}.tar.gz && \
-#     tar zxfv v${NETOPEER2_VERSION}.tar.gz
 
 # Build & install libyang
 RUN tar zxfv v${LIBYANG_VERSION}.tar.gz && \
@@ -78,8 +70,6 @@ RUN tar zxfv v${LIBYANG_VERSION}.tar.gz && \
           -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
           .. && \
     make install
-    # cd ../../ && \
-    # rm -rf v${LIBYANG_VERSION}.tar.gz libyang-${LIBYANG_VERSION}
 
 # Build & install sysrepo
 RUN tar zxfv v${SYSREPO_VERSION}.tar.gz && \
@@ -94,8 +84,6 @@ RUN tar zxfv v${SYSREPO_VERSION}.tar.gz && \
           -D SYSREPO_UMASK=${SYSREPO_UMASK} \
           .. && \
     make install
-    # cd ../../ && \
-    # rm -rf v${SYSREPO_VERSION}.tar.gz sysrepo-${SYSREPO_VERSION}
 
 # Build & install libnetconf2
 RUN tar zxfv v${LIBNETCONF2_VERSION}.tar.gz && \
@@ -107,13 +95,11 @@ RUN tar zxfv v${LIBNETCONF2_VERSION}.tar.gz && \
           -D ENABLE_TLS=${ENABLE_TLS} \
           -D ENABLE_DNSSEC=${ENABLE_DNSSEC} \
           .. && \
-    make install
-    # cd ../../ && \
-    # rm -rf v${LIBNETCONF2_VERSION}.tar.gz libnetconf2-${LIBNETCONF2_VERSION}
+    make install && \
+    ldconfig
 
 # Build & install netopeer2
-RUN ldconfig && \
-    tar zxfv v${NETOPEER2_VERSION}.tar.gz && \
+RUN tar zxfv v${NETOPEER2_VERSION}.tar.gz && \
     mkdir -p netopeer2-${NETOPEER2_VERSION}/build && \
     cd netopeer2-${NETOPEER2_VERSION}/build && \
     cmake -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
@@ -121,8 +107,6 @@ RUN ldconfig && \
           -D BUILD_CLI=${BUILD_CLI} \
           .. && \
     make install
-    # cd ../../ && \
-    # rm -rf v${NETOPEER2_VERSION}.tar.gz netopeer2-${NETOPEER2_VERSION}
 
 
 FROM ubuntu:${DISTRO_VERSION}
