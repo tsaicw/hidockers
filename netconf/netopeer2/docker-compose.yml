@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile.alpine
-      args:
+      args: &build-args
         LIBYANG_VERSION: ${LIBYANG_VERSION}
         LIBNETCONF2_VERSION: ${LIBNETCONF2_VERSION}
         SYSREPO_VERSION: ${SYSREPO_VERSION}
@@ -30,19 +30,6 @@ services:
       context: .
       dockerfile: ./Dockerfile.ubuntu
       args:
-        LIBYANG_VERSION: ${LIBYANG_VERSION}
-        LIBNETCONF2_VERSION: ${LIBNETCONF2_VERSION}
-        SYSREPO_VERSION: ${SYSREPO_VERSION}
-        NETOPEER2_VERSION: ${NETOPEER2_VERSION}
-        CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}
-        CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}
-        SYSREPO_GROUP: ${SYSREPO_GROUP}
-        SYSREPO_UMASK: ${SYSREPO_UMASK}
-        ENABLE_TLS: ${ENABLE_TLS}
-        ENABLE_SSH: ${ENABLE_SSH}
-        ENABLE_DNSSEC: ${ENABLE_DNSSEC}
-        BUILD_CLI: ${BUILD_CLI}
-        NETOPEER2_USER: ${NETOPEER2_USER}
-        NETOPEER2_PASSWD: ${NETOPEER2_PASSWD}
+        <<: *build-args
     hostname: np2-ubuntu
     command: bash
