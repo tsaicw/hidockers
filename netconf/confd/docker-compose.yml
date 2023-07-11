@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  confd:
+    image: ${CONFD_IMAGE}:${CONFD_TAG}
+    build: &confd-build
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        DISTRO_VERSION: ${DISTRO_VERSION}
+        CONFD_VERSION: ${CONFD_VERSION}
+        CONFD_OS: ${CONFD_OS}
+        CONFD_ARCH: ${CONFD_ARCH}
+        CONFD_PATH: ${CONFD_PATH}
+      target: confd
+    hostname: oam
+    command: bash
