@@ -141,3 +141,11 @@ RUN ln -s ${NETOPEER2_PATH}/bin/netopeer2-cli /usr/local/bin/ && \
     ln -s ${NETOPEER2_PATH}/bin/yangre /usr/local/bin/ && \
     mkdir -p /usr/local/sbin && \
     ln -s ${NETOPEER2_PATH}/sbin/netopeer2-server /usr/local/sbin/
+
+# Customized YANG modules
+COPY yang/ ${NETOPEER2_PATH}/share/yang/modules/custom/
+
+# Entrypoint script
+COPY scripts/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
