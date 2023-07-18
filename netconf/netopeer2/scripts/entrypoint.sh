@@ -17,6 +17,18 @@ NETOPEER2_SERVER_PIDFILE=${NETOPEER2_PATH}/netopeer2-server.pid
 CUSTOM_YANG_PATH=${NETOPEER2_PATH}/share/yang/modules/custom
 NETCONF_SSH_PORT=${NETCONF_SSH_PORT:-830}
 
+DEFAULT_SSH_LISTEN_CONFIG="<netconf-server xmlns=\"urn:ietf:params:xml:ns:yang:ietf-netconf-server\">
+  <listen>
+    <endpoint>
+      <name>default-ssh</name>
+      <ssh>
+        <tcp-server-parameters>
+          <local-port>${NETCONF_SSH_PORT}</local-port>
+        </tcp-server-parameters>
+      </ssh>
+    </endpoint>
+  </listen>
+</netconf-server>"
 
 #
 # Functions
@@ -68,6 +80,13 @@ function init_sysrepo_data {
     show_info "Initialize the Netopeer2 listen config"
     ${NETOPEER2_MERGE_CONFIG_SCRIPT}
   fi
+
+  # Initialize the SSH listen configurations
+  SSH_LISTEN_CONFIG_FILE=$(mktemp)
+  echo ${DEFAULT_SSH_LISTEN_CONFIG} > ${SSH_LISTEN_CONFIG_FILE}
+  ${SYSREPOCFG} --edit=${SSH_LISTEN_CONFIG_FILE} --datastore startup --format xml --module ietf-netconf-server -v2
+  ${SYSREPOCFG} --copy-from startup --module ietf-netconf-server -v2
+  rm ${SSH_LISTEN_CONFIG_FILE}
 
   # TODO: Other initialization data
   return 0
