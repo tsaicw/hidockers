@@ -5,6 +5,9 @@ SYSREPO_REPO_PATH=${NETOPEER2_PATH}/etc/sysrepo
 SYSREPO_DATA_PATH=${SYSREPO_REPO_PATH}/data
 SYSREPO_YANG_PATH=${SYSREPO_REPO_PATH}/yang
 
+NETOPEER2_SETUP_SCRIPT=${NETOPEER2_PATH}/share/netopeer2/setup.sh
+NETOPEER2_MERGE_HOSTKEY_SCRIPT=${NETOPEER2_PATH}/share/netopeer2/merge_hostkey.sh
+NETOPEER2_MERGE_CONFIG_SCRIPT=${NETOPEER2_PATH}/share/netopeer2/merge_config.sh
 SYSREPOCTL=${NETOPEER2_PATH}/bin/sysrepoctl
 SYSREPOCFG=${NETOPEER2_PATH}/bin/sysrepocfg
 NETOPEER2_CLI=${NETOPEER2_PATH}/bin/netopeer2-cli
@@ -24,21 +27,27 @@ function error_info { echo -e "\e[31m${1}\e[39m"; }
 
 
 #
-# ========== ConfD server ==========
+# ========== Netopeer2 server ==========
 #
 function install_yang_modules_into_sysrepo {
   job_title "Install the specified YANG modules into sysrepo"
 
+  # Install YANG modules of netopeer2
+  ${NETOPEER2_SETUP_SCRIPT}
+
+  # Install custom YANG modules
   if [ -d ${CUSTOM_YANG_PATH} ]; then
     YANG_MODULES=$(ls -p ${CUSTOM_YANG_PATH}/*.yang)
+
     for module in ${YANG_MODULES[@]}; do
-      module_name=$(basename ${module} | cut -d. -f1 | cut -d@ -f1)
-      if [ $(${SYSREPOCTL} --list | grep ${module_name} | wc -l) -eq 0 ]; then
+      module_name=$(basename ${module} | cut -d@ -f1)
+      if [ -z "$(${SYSREPOCTL} --list | grep ${module_name})" ]; then
         show_info "Install ${module_name} module"
         ${SYSREPOCTL} --install ${module}
       else
         revision=$(basename ${module} | cut -d. -f1 | cut -d@ -f2)
-        if [ "${revision}" != "$(${SYSREPOCTL} --list | grep ${module_name} | awk '{print $3}')"  ]; then
+        installed_revision=$(${SYSREPOCTL} --list | grep ${module_name} | awk '{print $3}')
+        if [ "${installed_revision}" \< "${revision}"  ]; then
           show_info "Update ${module_name} module to revision ${revision}"
           ${SYSREPOCTL} --update ${module}
         fi
@@ -49,7 +58,18 @@ function install_yang_modules_into_sysrepo {
 
 function init_sysrepo_data {
   job_title "Initialize data of Sysrepo"
-  # TODO: implementation
+
+  if [ -z "$(${SYSREPOCFG} --export --xpath keystore)" ]; then
+    show_info "Initialize the host key of Netopeer2"
+    ${NETOPEER2_MERGE_HOSTKEY_SCRIPT}
+  fi
+
+  if [ -z "$(${SYSREPOCFG} --export --xpath netconf-server)" ]; then
+    show_info "Initialize the Netopeer2 listen config"
+    ${NETOPEER2_MERGE_CONFIG_SCRIPT}
+  fi
+
+  # TODO: Other initialization data
   return 0
 }
 
