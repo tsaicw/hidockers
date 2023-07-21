@@ -13,6 +13,8 @@ RUN apt-get update && \
     echo "deb [ arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/mongodb.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-6.0.list && \
     apt-get update && \
     apt-get install -y mongodb-org && \
+# Supervisor
+    apt-get install -y supervisor && \
 # Open5GS
     add-apt-repository -y ppa:open5gs/latest && \
     apt-get update && \
@@ -22,7 +24,8 @@ RUN apt-get update && \
 # yq: a lightweight and portable command-line YAML, JSON and XML processor
 RUN curl -Ls https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq && chmod +x /usr/local/bin/yq
 
+COPY confs/open5gs.conf /etc/supervisor/conf.d/
 COPY scripts/ /usr/local/bin
 RUN mv /usr/local/bin/entrypoint.sh /
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/entrypoint.sh"]

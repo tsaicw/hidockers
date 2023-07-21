@@ -1,17 +1,23 @@
 #!/bin/bash
 
+SUPERVISORD_DAEMON=/usr/bin/supervisord
+SUPERVISORD_CONFIG=/etc/supervisor/supervisord.conf
+SUPERVISORD_PID_FILE=/var/run/supervisord.pid
 OPEN5GS_CMD=/usr/local/bin/open5gs
 
-function mongodb_start {
-  if [ $(ps aux | grep mongod | grep -v grep | wc -l) -eq 0 ]; then
-    /usr/bin/mongod --config /etc/mongod.conf &
-    echo -e "\e[92mWait for MongoDB server startup ...\n\e[39m"
-    sleep 5
-  fi
-}
+# function mongodb_start {
+#   if [ $(ps aux | grep mongod | grep -v grep | wc -l) -eq 0 ]; then
+#     /usr/bin/mongod --config /etc/mongod.conf &
+#     echo -e "\e[92mWait for MongoDB server startup ...\n\e[39m"
+#     sleep 5
+#   fi
+# }
 
-function stop_entrypoint {
+function entrypoint_terminate {
   ${OPEN5GS_CMD} stop
+  if [ -f ${SUPERVISORD_PID_FILE} ]; then
+    kill $(cat ${SUPERVISORD_PID_FILE})
+  fi
   run=false
 }
 
@@ -25,13 +31,10 @@ function open5gs_start {
 #
 # ========== Start from here ==========
 #
-mongodb_start
+${SUPERVISORD_DAEMON} -c ${SUPERVISORD_CONFIG}
+# mongodb_start
 
-if [ "${1}" = "bash" ]; then
-  exec "$@"
-else
-  open5gs_start
+open5gs_start
 
-  trap 'stop_entrypoint' TERM INT
-  while ${run}; do sleep 1; done
-fi
+trap 'entrypoint_terminate' TERM INT
+while ${run}; do sleep 1; done

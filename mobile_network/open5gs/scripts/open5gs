@@ -5,6 +5,15 @@ OPEN5GS_LOG_PATH=/var/log/open5gs
 
 declare -A SERVICES=([amf]=1 [ausf]=1 [bsf]=1 [hss]=1 [mme]=1 [nrf]=1 [nssf]=1 [pcf]=1 [pcrf]=1 [scp]=1 [sgwc]=1 [sgwu]=1 [smf]=1 [udm]=1 [udr]=1 [upf]=1)
 
+SUPERVISORCTL_CMD=/usr/bin/supervisorctl
+SUPERVISORD_PID_FILE=/var/run/supervisord.pid
+function supervisord_pid {
+  if [ -f ${SUPERVISORD_PID_FILE} ]; then
+    cat ${SUPERVISORD_PID_FILE}
+  else
+    return -1
+  fi
+}
 
 function execute_operation_on_service_or_services {
   operation=${1}
@@ -27,8 +36,13 @@ function execute_operation_on_service_or_services {
 
 function start_service {
   service=${1}
-  if [ -z "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
-    /usr/bin/open5gs-${service}d -c ${OPEN5GS_CONFIG_PATH}/${service}.yaml &
+  pid=$(supervisord_pid)
+  if [ $? -eq 0 ]; then
+    ${SUPERVISORCTL_CMD} start open5gs:${service}
+  else
+    if [ -z "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+      /usr/bin/open5gs-${service}d -c ${OPEN5GS_CONFIG_PATH}/${service}.yaml &
+    fi
   fi
 }
 
@@ -41,8 +55,13 @@ function restart_service {
 
 function stop_service {
   service=${1}
-  if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
-    kill $(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')
+  pid=$(supervisord_pid)
+  if [ $? -eq 0 ]; then
+    ${SUPERVISORCTL_CMD} stop open5gs:${service}
+  else
+    if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+      kill $(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')
+    fi
   fi
 }
 
@@ -55,13 +74,18 @@ function log_service {
 
 function status_services {
   echo -e "\e[34mStatus of Open5GS services:\e[39m"
-  for service in ${!SERVICES[@]}; do
-    if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
-      echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[32m running \e[39m]"
-    else
-      echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[31m stopped \e[39m]"
-    fi
-  done
+  pid=$(supervisord_pid)
+  if [ $? -eq 0 ]; then
+    ${SUPERVISORCTL_CMD} status open5gs:*
+  else
+    for service in ${!SERVICES[@]}; do
+      if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+        echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[32m running \e[39m]"
+      else
+        echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[31m stopped \e[39m]"
+      fi
+    done
+  fi
 }
 
 # tun iface create
