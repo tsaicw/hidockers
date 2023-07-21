@@ -1,0 +1,140 @@
+#!/bin/bash
+
+OPEN5GS_CONFIG_PATH=/etc/open5gs
+OPEN5GS_LOG_PATH=/var/log/open5gs
+
+declare -A SERVICES=([amf]=1 [ausf]=1 [bsf]=1 [hss]=1 [mme]=1 [nrf]=1 [nssf]=1 [pcf]=1 [pcrf]=1 [scp]=1 [sgwc]=1 [sgwu]=1 [smf]=1 [udm]=1 [udr]=1 [upf]=1)
+
+
+function execute_operation_on_service_or_services {
+  operation=${1}
+  service=${2}
+
+  if [ -n "${service}" ]; then
+    if [ -n "${SERVICES[${service}]}" ]; then
+      echo -e "\e[92m${operation} service open5gs-${service}d ...\e[39m"
+      eval ${operation,,}_service ${service}
+    else
+      echo -e "\e[31m${service} service is not supported\e[39m"
+    fi
+  else
+    echo -e "\e[92m${operation} Open5GS services ...\e[39m"
+    for service in ${!SERVICES[@]}; do
+      eval ${operation,,}_service ${service}
+    done
+  fi
+}
+
+function start_service {
+  service=${1}
+  if [ -z "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+    /usr/bin/open5gs-${service}d -c ${OPEN5GS_CONFIG_PATH}/${service}.yaml &
+  fi
+}
+
+function restart_service {
+  service=${1}
+  stop_service ${service}
+  sleep 1
+  start_service ${service}
+}
+
+function stop_service {
+  service=${1}
+  if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+    kill $(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')
+  fi
+}
+
+function log_service {
+  service=${1}
+  if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+    tail -f ${OPEN5GS_LOG_PATH}/${service}.log
+  fi
+}
+
+function status_services {
+  echo -e "\e[34mStatus of Open5GS services:\e[39m"
+  for service in ${!SERVICES[@]}; do
+    if [ -n "$(ps aux | grep open5gs-${service}d | grep -v grep | awk '{print $2}')" ]; then
+      echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[32m running \e[39m]"
+    else
+      echo -e "\e[33m  open5gs-${service}d     \e[39m[\e[31m stopped \e[39m]"
+    fi
+  done
+}
+
+# tun iface create
+function create_tuntap {
+  if ! grep "ogstun" /proc/net/dev > /dev/null; then
+    echo -e "\e[92mCreating \e[93mogstun \e[92mdevice\n\e[39m"
+    ip tuntap add name ogstun mode tun
+  fi
+
+  ip addr del ${IPV4_TUN_ADDR} dev ogstun 2> /dev/null || true
+  ip addr add ${IPV4_TUN_ADDR} dev ogstun
+
+  # sysctl -w net.ipv6.conf.all.disable_ipv6=0
+  ip addr del ${IPV6_TUN_ADDR} dev ogstun 2> /dev/null || true
+  ip addr add ${IPV6_TUN_ADDR} dev ogstun
+
+  ip link set ogstun up
+
+  # sysctl -w net.ipv4.ip_forward=1
+  if [ "${ENABLE_NAT}" = true ] ; then
+    iptables -t nat -A POSTROUTING -s ${IPV4_TUN_SUBNET} ! -o ogstun -j MASQUERADE
+  fi
+}
+
+function setup_configs {
+  ETH0_IPADDR=$(ip -br addr show dev eth0 | awk '{print $3}' | cut -d'/' -f1)
+
+  if [ -n "${ETH0_IPADDR}" ]; then
+    # AMF
+    yq -i ".amf.ngap[0].addr = \"${ETH0_IPADDR}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+    if [ -n "${MCC}" ]; then
+      yq -i ".amf.guami[0].plmn_id.mcc = \"${MCC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+      yq -i ".amf.tai[0].plmn_id.mcc = \"${MCC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+      yq -i ".amf.plmn_support[0].plmn_id.mcc = \"${MCC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+    fi
+    if [ -n "${MNC}" ]; then
+      yq -i ".amf.guami[0].plmn_id.mnc = \"${MNC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+      yq -i ".amf.tai[0].plmn_id.mnc = \"${MNC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+      yq -i ".amf.plmn_support[0].plmn_id.mnc = \"${MNC}\"" ${OPEN5GS_CONFIG_PATH}/amf.yaml
+    fi
+
+    # UPF
+    yq -i ".upf.gtpu[0].addr = \"${ETH0_IPADDR}\"" ${OPEN5GS_CONFIG_PATH}/upf.yaml
+    if [ -n "${UPF_GTPU_ADVERTISE}" ]; then
+      yq -i ".upf.gtpu[0].advertise = \"${UPF_GTPU_ADVERTISE}\"" ${OPEN5GS_CONFIG_PATH}/upf.yaml
+    fi
+  fi
+}
+
+
+command=${1}
+shift
+
+if [ "${command}" = "start" ]; then
+  execute_operation_on_service_or_services Start ${@}
+elif [ "${command}" = "restart" ]; then
+  execute_operation_on_service_or_services Restart ${@}
+elif [ "${command}" = "stop" ]; then
+  execute_operation_on_service_or_services Stop ${@}
+elif [ "${command}" = "create_tuntap" ]; then
+  create_tuntap
+elif [ "${command}" = "setup" ]; then
+  setup_configs
+elif [ "${command}" = "log" ]; then
+  service=${1}
+  if [ -n "${SERVICES[${service}]}" ]; then
+    log_service ${service}
+  else
+    echo -e "\e[31m${service} service is not supported\e[39m"
+  fi
+elif [ "${command}" = "status" ]; then
+  status_services
+else
+  echo -e "\e[93mUsage:\n  \e[39m${0} [start|restart|stop|status|log]"
+  exit 1
+fi

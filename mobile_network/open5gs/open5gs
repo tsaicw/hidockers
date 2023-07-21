@@ -15,7 +15,11 @@ else
                        --env ENABLE_NAT=true \
                        --env NODE_ENV=production \
                        --env UPF_GTPU_ADVERTISE= \
+                       --env MCC=999 \
+                       --env MNC=70 \
                        --publish 38412:38412/sctp \
                        --publish 2152:2152/udp \
-                       open5gs
+                       --publish 3000:3000/tcp \
+                       --volume ${PWD}:/home/host \
+                       open5gs bash
 fi

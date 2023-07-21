@@ -1,3 +1,0 @@
-#!/bin/bash
-
-kill $(ps aux | grep open5gs | grep -v grep | awk '{print $2}')

@@ -17,7 +17,10 @@ services:
     ports:
     - 38412:38412/sctp
     - 2152:2152/udp
+    - 3000:3000/tcp
     environment:
       ENABLE_NAT: 'true'
       NODE_ENV: production
       UPF_GTPU_ADVERTISE:
+      MCC: 999
+      MNC: 70
