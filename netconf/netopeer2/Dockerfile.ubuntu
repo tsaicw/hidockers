@@ -150,4 +150,4 @@ COPY yang/ ${NETOPEER2_PATH}/share/yang/modules/custom/
 # Entrypoint script
 COPY scripts/entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["/entrypoint.sh"]

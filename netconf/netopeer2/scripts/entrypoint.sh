@@ -49,22 +49,26 @@ function install_yang_modules_into_sysrepo {
 
   # Install custom YANG modules
   if [ -d ${CUSTOM_YANG_PATH} ]; then
-    YANG_MODULES=$(ls -p ${CUSTOM_YANG_PATH}/*.yang)
+    YANG_MODULES=$(ls -p ${CUSTOM_YANG_PATH}/*.yang 2> /dev/null)
 
-    for module in ${YANG_MODULES[@]}; do
-      module_name=$(basename ${module} | cut -d@ -f1)
-      if [ -z "$(${SYSREPOCTL} --list | grep ${module_name})" ]; then
-        show_info "Install ${module_name} module"
-        ${SYSREPOCTL} --install ${module}
-      else
-        revision=$(basename ${module} | cut -d. -f1 | cut -d@ -f2)
-        installed_revision=$(${SYSREPOCTL} --list | grep ${module_name} | awk '{print $3}')
-        if [ "${installed_revision}" \< "${revision}"  ]; then
-          show_info "Update ${module_name} module to revision ${revision}"
-          ${SYSREPOCTL} --update ${module}
+    if [ $? -eq 0 ]; then
+      for module in ${YANG_MODULES[@]}; do
+        module_name=$(basename ${module} | cut -d@ -f1)
+        if [ -z "$(${SYSREPOCTL} --list | grep ${module_name})" ]; then
+          show_info "Install ${module_name} module"
+          ${SYSREPOCTL} --install ${module}
+        else
+          revision=$(basename ${module} | cut -d. -f1 | cut -d@ -f2)
+          installed_revision=$(${SYSREPOCTL} --list | grep ${module_name} | awk '{print $3}')
+          if [ "${installed_revision}" \< "${revision}"  ]; then
+            show_info "Update ${module_name} module to revision ${revision}"
+            ${SYSREPOCTL} --update ${module}
+          fi
         fi
-      fi
-    done
+      done
+    else
+      show_info "No customize YANG modules"
+    fi
   fi
 }
 
@@ -96,10 +100,14 @@ function start_netopeer2 {
   job_title "Start Netopeer2 server"
   ${NETOPEER2_SERVER} -p ${NETOPEER2_SERVER_PIDFILE}
   show_info "\nNetopeer2 server is up ......\n"
-
-  trap "kill $(cat ${NETOPEER2_SERVER_PIDFILE})" TERM INT; sleep infinity & wait
 }
 
+function entrypoint_terminate {
+  if [ -f ${NETOPEER2_SERVER_PIDFILE} ]; then
+    kill $(cat ${NETOPEER2_SERVER_PIDFILE})
+  fi
+  run=false
+}
 
 #
 # ========== Container entry point ==========
@@ -112,13 +120,11 @@ echo -e "\e[33m  Netopeer2 PID File: ${NETOPEER2_SERVER_PIDFILE}"
 echo -e "\e[33m  SSH Port: ${NETCONF_SSH_PORT}"
 echo -e "\e[32m============================================\e[39m"
 
-if [ "${1}" = "bash" -o "${1}" = "ash" ]; then
-  exec "$@"
-else
-  install_yang_modules_into_sysrepo
-  init_sysrepo_data
+install_yang_modules_into_sysrepo
+init_sysrepo_data
 
-  if [ "${1}" != "--init-only" ]; then
-    start_netopeer2
-  fi
+if [ "${1}" != "--init-only" ]; then
+  start_netopeer2
+  trap 'entrypoint_terminate' TERM INT
+  while ${run}; do sleep 1; done
 fi
