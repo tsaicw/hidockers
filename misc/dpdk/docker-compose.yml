@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  alpine-buildenv:
+    image: dpdk/buildenv:${DPDK_VERSION}-alpine
+    build:
+      context: .
+      dockerfile: ./Dockerfile.alpine
+      target: buildenv
+      args: &build-args
+        DPDK_VERSION: ${DPDK_VERSION}
+        RTE_SDK: ${RTE_SDK}
+        RTE_TARGET: ${RTE_TARGET}
+    hostname: dpdkbuild-alpine
+    volumes:
+    - ${PWD}:/home/host
+    command: ash
+
+  alpine:
+    image: dpdk/runenv:${DPDK_VERSION}-alpine
+    build:
+      context: .
+      dockerfile: ./Dockerfile.alpine
+      target: runenv
+      args:
+        <<: *build-args
+    hostname: dpdk-alpine
+    privileged: true
+    volumes:
+    - ${PWD}:/home/host
+    command: ash -c "mkdir /mnt/hugepages-1Gi &&
+                     mount -t hugetlbfs -o pagesize=1Gi nodev /mnt/hugepages-1Gi &&
+                     mkdir /mnt/hugepages-2Mi &&
+                     mount -t hugetlbfs -o pagesize=2Mi nodev /mnt/hugepages-2Mi &&
+                     ash"
+
+  ubuntu-buildenv:
+    image: dpdk/buildenv:${DPDK_VERSION}-ubuntu
+    build:
+      context: .
+      dockerfile: ./Dockerfile.ubuntu
+      target: buildenv
+      args:
+        <<: *build-args
+    hostname: dpdkbuild-ubuntu
+    volumes:
+    - ${PWD}:/home/host
+    command: bash
+
+  ubuntu:
+    image: dpdk/runenv:${DPDK_VERSION}-ubuntu
+    build:
+      context: .
+      dockerfile: ./Dockerfile.ubuntu
+      target: runenv
+      args:
+        <<: *build-args
+    hostname: dpdk-ubuntu
+    privileged: true
+    volumes:
+    - ${PWD}:/home/host
+    command: bash -c "mkdir /mnt/hugepages-1Gi &&
+                      mount -t hugetlbfs -o pagesize=1Gi nodev /mnt/hugepages-1Gi &&
+                      mkdir /mnt/hugepages-2Mi &&
+                      mount -t hugetlbfs -o pagesize=2Mi nodev /mnt/hugepages-2Mi &&
+                      bash"

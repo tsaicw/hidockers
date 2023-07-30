@@ -1,0 +1,46 @@
+ARG DISTRO_VERSION=22.04
+FROM ubuntu:${DISTRO_VERSION} as buildenv
+
+# Prerequisites
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y build-essential python3 meson ninja-build libnuma-dev \
+                       vim less pkg-config && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG DPDK_VERSION=20.11.8
+ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
+ARG RTE_TARGET=x86_64-native-linuxapp-gcc
+
+ENV DPDK_VERSION=${DPDK_VERSION}
+ENV RTE_SDK=${RTE_SDK}
+ENV RTE_TARGET=${RTE_TARGET}
+ENV PKG_CONFIG_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu/pkgconfig
+ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu
+
+WORKDIR /root
+
+COPY artifacts/dpdk-${DPDK_VERSION}.tar.xz /root
+RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
+    cd dpdk-stable-${DPDK_VERSION} && \
+    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} build && \
+    ninja -C build install
+
+
+FROM ubuntu:${DISTRO_VERSION} as runenv
+
+# Prerequisites
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y libnuma1 && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG DPDK_VERSION=20.11.8
+ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
+ARG RTE_TARGET=x86_64-native-linuxapp-gcc
+
+ENV DPDK_VERSION=${DPDK_VERSION}
+ENV RTE_SDK=${RTE_SDK}
+ENV RTE_TARGET=${RTE_TARGET}
+ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu
+
+WORKDIR /root
+COPY --from=buildenv ${RTE_SDK} ${RTE_SDK}

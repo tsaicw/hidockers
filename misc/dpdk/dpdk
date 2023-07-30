@@ -1,0 +1,22 @@
+#!/bin/bash
+
+CONTAINER_IMAGE=dpdk/buildenv:20.11.8-ubuntu
+CONTAINER_NAME=dpdkenv
+
+if [ -n "$(docker container ls --filter name=${CONTAINER_NAME} --quiet)" ]; then
+  echo -e "\e[32mAttach to \e[33m${CONTAINER_NAME} \e[32mcontainer\e[39m"
+  docker container attach ${CONTAINER_NAME}
+else
+  echo -e "\e[32mStart \e[33m${CONTAINER_NAME} \e[32mcontainer\e[39m"
+  docker container run --rm -it \
+                       --name ${CONTAINER_NAME} \
+                       --hostname ${CONTAINER_NAME} \
+                       --privileged \
+                       --volume ${PWD}:/home/host \
+                       ${CONTAINER_IMAGE} \
+                       bash -c "mkdir /mnt/hugepages-1Gi &&
+                                mount -t hugetlbfs -o pagesize=1Gi nodev /mnt/hugepages-1Gi &&
+                                mkdir /mnt/hugepages-2Mi &&
+                                mount -t hugetlbfs -o pagesize=2Mi nodev /mnt/hugepages-2Mi &&
+                                bash"
+fi
