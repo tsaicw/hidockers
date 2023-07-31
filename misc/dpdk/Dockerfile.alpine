@@ -1,11 +1,40 @@
+# ==========================================================
+#   Build the Data Plane Development Kit (DPDK)
+# ==========================================================
 ARG DISTRO_VERSION=3.15
-FROM alpine:${DISTRO_VERSION} as buildenv
+FROM alpine:${DISTRO_VERSION} as build-dpdk
 
 # Prerequisites
 RUN apk update && apk upgrade && \
     apk add gcc g++ linux-headers bsd-compat-headers libexecinfo-dev \
-            python3 meson ninja numactl-dev \
-            xz vim less pkgconf && \
+            meson ninja numactl-dev xz && \
+    rm -rf /var/cache/apk/*
+
+ARG DPDK_VERSION=20.11.8
+ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
+ARG RTE_TARGET=x86_64-native-linuxapp-gcc
+
+ENV DPDK_VERSION=${DPDK_VERSION}
+ENV RTE_SDK=${RTE_SDK}
+ENV RTE_TARGET=${RTE_TARGET}
+
+WORKDIR /root
+
+COPY artifacts/dpdk-${DPDK_VERSION}.tar.xz /root
+RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
+    cd dpdk-stable-${DPDK_VERSION} && \
+    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} build && \
+    ninja -C build install
+
+
+# ==========================================================
+#   Container for building DPDK applications
+# ==========================================================
+FROM alpine:${DISTRO_VERSION} as buildenv
+
+# Dependencies
+RUN apk update && apk upgrade && \
+    apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl && \
     rm -rf /var/cache/apk/*
 
 ARG DPDK_VERSION=20.11.8
@@ -19,17 +48,15 @@ ENV PKG_CONFIG_PATH=${RTE_SDK}/${RTE_TARGET}/lib/pkgconfig
 ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/
 
 WORKDIR /root
-
-COPY artifacts/dpdk-${DPDK_VERSION}.tar.xz /root
-RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
-    cd dpdk-stable-${DPDK_VERSION} && \
-    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} build && \
-    ninja -C build install
+COPY --from=build-dpdk ${RTE_SDK} ${RTE_SDK}
 
 
+# ==========================================================
+#   Container for running DPDK applications
+# ==========================================================
 FROM alpine:${DISTRO_VERSION} as runenv
 
-# Prerequisites
+# Dependencies
 RUN apk update && apk upgrade && \
     apk add libexecinfo numactl && \
     rm -rf /var/cache/apk/*
@@ -44,4 +71,4 @@ ENV RTE_TARGET=${RTE_TARGET}
 ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/
 
 WORKDIR /root
-COPY --from=buildenv ${RTE_SDK} ${RTE_SDK}
+COPY --from=build-dpdk ${RTE_SDK} ${RTE_SDK}
