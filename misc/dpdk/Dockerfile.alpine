@@ -7,7 +7,7 @@ FROM alpine:${DISTRO_VERSION} as build-dpdk
 # Prerequisites
 RUN apk update && apk upgrade && \
     apk add gcc g++ linux-headers bsd-compat-headers libexecinfo-dev \
-            meson ninja numactl-dev xz && \
+            meson ninja numactl-dev py3-elftools xz && \
     rm -rf /var/cache/apk/*
 
 ARG DPDK_VERSION=20.11.9
