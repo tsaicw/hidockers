@@ -1,13 +1,15 @@
 # ==========================================================
 #   Build the Data Plane Development Kit (DPDK)
 # ==========================================================
-ARG DISTRO_VERSION=22.04
-FROM ubuntu:${DISTRO_VERSION} as build-dpdk
+ARG DISTRO_VERSION=7.9.2009
+FROM centos:${DISTRO_VERSION} as build-dpdk
 
 # Prerequisites
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y build-essential meson ninja-build libnuma-dev && \
-    rm -rf /var/lib/apt/lists/*
+RUN yum update -y && yum upgrade -y && \
+    yum install -y epel-release && \
+    yum install -y meson ninja-build numactl-devel && \
+    yum group install -y "Development Tools" && \
+    yum clean all && rm -rf /var/cache/yum/*
 
 ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
@@ -29,12 +31,14 @@ RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
 # ==========================================================
 #   Container for building DPDK applications
 # ==========================================================
-FROM ubuntu:${DISTRO_VERSION} as buildenv
+FROM centos:${DISTRO_VERSION} as buildenv
 
 # Dependencies
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y build-essential meson ninja-build pkg-config libnuma1 && \
-    rm -rf /var/lib/apt/lists/*
+RUN yum update -y && yum upgrade -y && \
+    yum install -y epel-release && \
+    yum install -y meson ninja-build pkg-config numactl && \
+    yum group install -y "Development Tools" && \
+    yum clean all && rm -rf /var/cache/yum/*
 
 ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
@@ -43,8 +47,8 @@ ARG RTE_TARGET=x86_64-native-linuxapp-gcc
 ENV DPDK_VERSION=${DPDK_VERSION}
 ENV RTE_SDK=${RTE_SDK}
 ENV RTE_TARGET=${RTE_TARGET}
-ENV PKG_CONFIG_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu/pkgconfig
-ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu
+ENV PKG_CONFIG_PATH=${RTE_SDK}/${RTE_TARGET}/lib64/pkgconfig
+ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib64
 
 WORKDIR /root
 COPY --from=build-dpdk ${RTE_SDK} ${RTE_SDK}
@@ -53,12 +57,12 @@ COPY --from=build-dpdk ${RTE_SDK} ${RTE_SDK}
 # ==========================================================
 #   Container for running DPDK applications
 # ==========================================================
-FROM ubuntu:${DISTRO_VERSION} as runenv
+FROM centos:${DISTRO_VERSION} as runenv
 
 # Dependencies
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y libnuma1 && \
-    rm -rf /var/lib/apt/lists/*
+RUN yum update -y && yum upgrade -y && \
+    yum install -y numactl && \
+    yum clean all && rm -rf /var/cache/yum/*
 
 ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
@@ -67,7 +71,7 @@ ARG RTE_TARGET=x86_64-native-linuxapp-gcc
 ENV DPDK_VERSION=${DPDK_VERSION}
 ENV RTE_SDK=${RTE_SDK}
 ENV RTE_TARGET=${RTE_TARGET}
-ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib/x86_64-linux-gnu
+ENV LD_LIBRARY_PATH=${RTE_SDK}/${RTE_TARGET}/lib64
 
 WORKDIR /root
 COPY --from=build-dpdk ${RTE_SDK} ${RTE_SDK}

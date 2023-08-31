@@ -10,7 +10,7 @@ RUN apk update && apk upgrade && \
             meson ninja numactl-dev xz && \
     rm -rf /var/cache/apk/*
 
-ARG DPDK_VERSION=20.11.8
+ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
 ARG RTE_TARGET=x86_64-native-linuxapp-gcc
 
@@ -23,7 +23,7 @@ WORKDIR /root
 COPY artifacts/dpdk-${DPDK_VERSION}.tar.xz /root
 RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
     cd dpdk-stable-${DPDK_VERSION} && \
-    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} build && \
+    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} --buildtype release build && \
     ninja -C build install
 
 
@@ -37,7 +37,7 @@ RUN apk update && apk upgrade && \
     apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl && \
     rm -rf /var/cache/apk/*
 
-ARG DPDK_VERSION=20.11.8
+ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
 ARG RTE_TARGET=x86_64-native-linuxapp-gcc
 
@@ -61,7 +61,7 @@ RUN apk update && apk upgrade && \
     apk add libexecinfo numactl && \
     rm -rf /var/cache/apk/*
 
-ARG DPDK_VERSION=20.11.8
+ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
 ARG RTE_TARGET=x86_64-native-linuxapp-gcc
 

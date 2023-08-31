@@ -64,3 +64,34 @@ services:
                       mkdir /mnt/hugepages-2Mi &&
                       mount -t hugetlbfs -o pagesize=2Mi nodev /mnt/hugepages-2Mi &&
                       bash"
+
+  centos-buildenv:
+    image: dpdk/buildenv:${DPDK_VERSION}-centos
+    build:
+      context: .
+      dockerfile: ./Dockerfile.centos
+      target: buildenv
+      args:
+        <<: *build-args
+    hostname: dpdkbuild-centos
+    volumes:
+    - ${PWD}:/home/host
+    command: bash
+
+  centos:
+    image: dpdk/runenv:${DPDK_VERSION}-centos
+    build:
+      context: .
+      dockerfile: ./Dockerfile.centos
+      target: runenv
+      args:
+        <<: *build-args
+    hostname: dpdk-centos
+    privileged: true
+    volumes:
+    - ${PWD}:/home/host
+    command: bash -c "mkdir /mnt/hugepages-1Gi &&
+                      mount -t hugetlbfs -o pagesize=1Gi nodev /mnt/hugepages-1Gi &&
+                      mkdir /mnt/hugepages-2Mi &&
+                      mount -t hugetlbfs -o pagesize=2Mi nodev /mnt/hugepages-2Mi &&
+                      bash"
