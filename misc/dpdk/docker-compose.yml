@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   alpine-buildenv:
-    image: dpdk/buildenv:${DPDK_VERSION}-alpine
+    image: dpdk/buildenv:${DPDK_VERSION}-alpine-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.alpine
@@ -11,13 +11,14 @@ services:
         DPDK_VERSION: ${DPDK_VERSION}
         RTE_SDK: ${RTE_SDK}
         RTE_TARGET: ${RTE_TARGET}
+        BUILD_TYPE: ${BUILD_TYPE}
     hostname: dpdkbuild-alpine
     volumes:
     - ${PWD}:/home/host
     command: ash
 
   alpine:
-    image: dpdk/runenv:${DPDK_VERSION}-alpine
+    image: dpdk/runenv:${DPDK_VERSION}-alpine-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.alpine
@@ -35,7 +36,7 @@ services:
                      ash"
 
   ubuntu-buildenv:
-    image: dpdk/buildenv:${DPDK_VERSION}-ubuntu
+    image: dpdk/buildenv:${DPDK_VERSION}-ubuntu-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.ubuntu
@@ -48,7 +49,7 @@ services:
     command: bash
 
   ubuntu:
-    image: dpdk/runenv:${DPDK_VERSION}-ubuntu
+    image: dpdk/runenv:${DPDK_VERSION}-ubuntu-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.ubuntu
@@ -66,7 +67,7 @@ services:
                       bash"
 
   centos-buildenv:
-    image: dpdk/buildenv:${DPDK_VERSION}-centos
+    image: dpdk/buildenv:${DPDK_VERSION}-centos-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.centos
@@ -79,7 +80,7 @@ services:
     command: bash
 
   centos:
-    image: dpdk/runenv:${DPDK_VERSION}-centos
+    image: dpdk/runenv:${DPDK_VERSION}-centos-${BUILD_TYPE}
     build:
       context: .
       dockerfile: ./Dockerfile.centos

@@ -13,6 +13,7 @@ RUN apk update && apk upgrade && \
 ARG DPDK_VERSION=20.11.9
 ARG RTE_SDK=/opt/dpdk/${DPDK_VERSION}
 ARG RTE_TARGET=x86_64-native-linuxapp-gcc
+ARG BUILD_TYPE=release
 
 ENV DPDK_VERSION=${DPDK_VERSION}
 ENV RTE_SDK=${RTE_SDK}
@@ -23,7 +24,7 @@ WORKDIR /root
 COPY artifacts/dpdk-${DPDK_VERSION}.tar.xz /root
 RUN tar Jxfv dpdk-${DPDK_VERSION}.tar.xz && \
     cd dpdk-stable-${DPDK_VERSION} && \
-    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} --buildtype release build && \
+    meson setup --prefix ${RTE_SDK}/${RTE_TARGET} --buildtype ${BUILD_TYPE} build && \
     ninja -C build install
 
 
