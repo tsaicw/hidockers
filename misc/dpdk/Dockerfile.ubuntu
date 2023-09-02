@@ -34,7 +34,7 @@ FROM ubuntu:${DISTRO_VERSION} as buildenv
 
 # Dependencies
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y build-essential meson ninja-build pkg-config libnuma1 && \
+    apt-get install -y build-essential meson ninja-build pkg-config libnuma-dev && \
     rm -rf /var/lib/apt/lists/*
 
 ARG DPDK_VERSION=20.11.9

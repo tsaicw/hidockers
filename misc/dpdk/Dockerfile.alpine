@@ -35,7 +35,7 @@ FROM alpine:${DISTRO_VERSION} as buildenv
 
 # Dependencies
 RUN apk update && apk upgrade && \
-    apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl && \
+    apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl-dev && \
     rm -rf /var/cache/apk/*
 
 ARG DPDK_VERSION=20.11.9
