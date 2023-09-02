@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONTAINER_IMAGE=dpdk/buildenv:20.11.9-ubuntu
+CONTAINER_IMAGE=dpdk/buildenv:20.11.9-ubuntu-release
 CONTAINER_NAME=dpdkenv
 
 if [ -n "$(docker container ls --filter name=${CONTAINER_NAME} --quiet)" ]; then

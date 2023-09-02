@@ -11,9 +11,15 @@ endif
 
 CFLAGS += -O3 $(shell $(PKGCONF) --cflags libdpdk)
 LDFLAGS_SHARED = $(shell $(PKGCONF) --libs libdpdk)
+LDFLAGS_STATIC = $(shell $(PKGCONF) --static --libs libdpdk)
 
-$(APP): $(SRCS-y) Makefile
-	$(CC) $(CFLAGS) $(SRCS-y) -o $@ $(LDFLAGS_SHARED)
+all: shared static
+
+shared: $(SRCS-y)
+	$(CC) $(CFLAGS) $(SRCS-y) -o $(APP)-shared $(LDFLAGS_SHARED)
+
+static: $(SRCS-y)
+	$(CC) $(CFLAGS) $(SRCS-y) -o $(APP)-static $(LDFLAGS_STATIC)
 
 clean:
-	rm -f ${APP}
+	rm -f $(APP)-*
