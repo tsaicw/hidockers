@@ -1,0 +1,2 @@
+option('kernel_dir', type: 'string', value: '', description:
+       'Path to the kernel for building kernel modules. Headers must be in $kernel_dir or $kernel_dir/build')
