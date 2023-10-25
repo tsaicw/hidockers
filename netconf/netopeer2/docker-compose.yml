@@ -33,3 +33,13 @@ services:
         <<: *build-args
     hostname: np2-ubuntu
     command: bash
+
+  centos:
+    image: netopeer2:centos
+    build:
+      context: .
+      dockerfile: ./Dockerfile.centos
+      args:
+        <<: *build-args
+    hostname: np2-centos
+    command: bash

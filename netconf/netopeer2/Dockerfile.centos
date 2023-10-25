@@ -1,0 +1,153 @@
+# ==========================================================
+#   Netopeer2 Server
+#
+#   Dependencies:
+#     Build time:
+#       Libyang: C compiler, CMake >= 2.8.12, libpcre2 (including headers - devel package) >= 10.30
+#       Libnetconf2: Libyang, C compiler, CMake >= 2.8.12, libssh >= 0.9.0, OpenSSL (for TLS support)
+#       Sysrepo: Libyang, C compiler, CMake >= 2.8.12, tar(1)
+#       Netopeer2: Libyang, Libnetconf2, Sysrepo
+#
+#     Runtime:
+#       Libyang: libpcre2 (runtime package) >= 10.30
+#       Libnetconf2: libssh >= 0.9.0
+# ==========================================================
+
+ARG DISTRO_VERSION=7.9.2009
+FROM centos:${DISTRO_VERSION} as build
+
+# Prerequisites
+RUN yum update -y && \
+    yum install -y curl gcc gcc-c++ cmake make \
+                   pcre2 pcre2-devel \
+                   libssh libssh-devel \
+                   openssl openssl-devel && \
+    yum clean all && rm -rf /var/cache/yum/*
+
+#
+# Common build arguments
+#
+ARG LIBYANG_VERSION=2.1.80
+ARG LIBNETCONF2_VERSION=2.1.34
+ARG SYSREPO_VERSION=2.2.73
+ARG NETOPEER2_VERSION=2.1.62
+
+WORKDIR /root
+RUN curl -LO https://github.com/CESNET/libyang/archive/refs/tags/v${LIBYANG_VERSION}.tar.gz && \
+    curl -LO https://github.com/CESNET/libnetconf2/archive/refs/tags/v${LIBNETCONF2_VERSION}.tar.gz && \
+    curl -LO https://github.com/sysrepo/sysrepo/archive/refs/tags/v${SYSREPO_VERSION}.tar.gz && \
+    curl -LO https://github.com/CESNET/netopeer2/archive/refs/tags/v${NETOPEER2_VERSION}.tar.gz
+
+ARG CMAKE_INSTALL_PREFIX=/opt/netopeer2
+ARG CMAKE_BUILD_TYPE=Debug
+
+# Arguments of Sysrepo
+ARG REPO_PATH=${CMAKE_INSTALL_PREFIX}/etc/sysrepo
+ARG SR_PLUGINS_PATH=${CMAKE_INSTALL_PREFIX}/lib/sysrepo/plugins
+ARG SRPD_PLUGINS_PATH=${CMAKE_INSTALL_PREFIX}/lib/sysrepo-plugind/plugins
+ARG SYSREPO_GROUP=sysrepo
+ARG SYSREPO_UMASK=00007
+
+# Arguments of Libnetconf2
+ARG ENABLE_TLS=ON
+ARG ENABLE_SSH=ON
+ARG ENABLE_DNSSEC=OFF
+
+# Arguments of Netopeer2
+ARG BUILD_CLI=ON
+
+RUN groupadd ${SYSREPO_GROUP}
+
+# Environment variables
+ENV NETOPEER2_PATH=${CMAKE_INSTALL_PREFIX}
+ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib64
+
+# Build & install libyang
+RUN tar zxfv v${LIBYANG_VERSION}.tar.gz && \
+    mkdir -p libyang-${LIBYANG_VERSION}/build && \
+    cd libyang-${LIBYANG_VERSION}/build && \
+    cmake -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+          -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
+          .. && \
+    make install
+
+# Build & install sysrepo
+RUN tar zxfv v${SYSREPO_VERSION}.tar.gz && \
+    mkdir -p sysrepo-${SYSREPO_VERSION}/build && \
+    cd sysrepo-${SYSREPO_VERSION}/build && \
+    cmake -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+          -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
+          -D REPO_PATH=${REPO_PATH} \
+          -D SR_PLUGINS_PATH=${SR_PLUGINS_PATH} \
+          -D SRPD_PLUGINS_PATH=${SRPD_PLUGINS_PATH} \
+          -D SYSREPO_GROUP=${SYSREPO_GROUP} \
+          -D SYSREPO_UMASK=${SYSREPO_UMASK} \
+          .. && \
+    make install
+
+# Build & install libnetconf2
+RUN tar zxfv v${LIBNETCONF2_VERSION}.tar.gz && \
+    mkdir -p libnetconf2-${LIBNETCONF2_VERSION}/build && \
+    cd libnetconf2-${LIBNETCONF2_VERSION}/build && \
+    cmake -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+          -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
+          -D ENABLE_SSH=${ENABLE_SSH} \
+          -D ENABLE_TLS=${ENABLE_TLS} \
+          -D ENABLE_DNSSEC=${ENABLE_DNSSEC} \
+          .. && \
+    make install && \
+    ldconfig
+
+# Build & install netopeer2
+RUN tar zxfv v${NETOPEER2_VERSION}.tar.gz && \
+    mkdir -p netopeer2-${NETOPEER2_VERSION}/build && \
+    cd netopeer2-${NETOPEER2_VERSION}/build && \
+    cmake -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} \
+          -D CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} \
+          -D BUILD_CLI=${BUILD_CLI} \
+          .. && \
+    make install
+
+
+FROM centos:${DISTRO_VERSION}
+
+# Prerequisites
+RUN yum update -y && \
+    yum install -y pcre2 libssh openss && \
+    yum clean all && rm -rf /var/cache/yum/*
+
+# Build arguments
+ARG CMAKE_INSTALL_PREFIX=/opt/netopeer2
+ARG SYSREPO_GROUP=sysrepo
+ARG NETOPEER2_USER=netconf
+ARG NETOPEER2_PASSWD=netconf
+
+# Environment variables
+ENV NETOPEER2_PATH=${CMAKE_INSTALL_PREFIX}
+ENV LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib64
+ENV NP2_MODULE_DIR=${CMAKE_INSTALL_PREFIX}/share/yang/modules/netopeer2
+ENV NP2_MODULE_PERMS=600
+
+WORKDIR ${NETOPEER2_PATH}
+
+RUN groupadd ${SYSREPO_GROUP} && \
+    useradd -m -d /home/${NETOPEER2_USER} -s /sbin/nologin -g ${SYSREPO_GROUP} ${NETOPEER2_USER} && \
+    echo "${NETOPEER2_USER}:${NETOPEER2_PASSWD}" | chpasswd
+
+COPY --from=build ${NETOPEER2_PATH} ${NETOPEER2_PATH}
+RUN ln -s ${NETOPEER2_PATH}/bin/netopeer2-cli /usr/local/bin/ && \
+    ln -s ${NETOPEER2_PATH}/bin/sysrepo-plugind /usr/local/bin/ && \
+    ln -s ${NETOPEER2_PATH}/bin/sysrepocfg /usr/local/bin/ && \
+    ln -s ${NETOPEER2_PATH}/bin/sysrepoctl /usr/local/bin/ && \
+    ln -s ${NETOPEER2_PATH}/bin/yanglint /usr/local/bin/ && \
+    ln -s ${NETOPEER2_PATH}/bin/yangre /usr/local/bin/ && \
+    mkdir -p /usr/local/sbin && \
+    ln -s ${NETOPEER2_PATH}/sbin/netopeer2-server /usr/local/sbin/
+
+# Customized YANG modules
+COPY yang/ ${NETOPEER2_PATH}/share/yang/modules/custom/
+
+# Entrypoint script
+COPY scripts/entrypoint.sh /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
