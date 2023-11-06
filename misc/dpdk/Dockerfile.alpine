@@ -7,7 +7,8 @@ FROM alpine:${DISTRO_VERSION} as build-dpdk
 # Prerequisites
 RUN apk update && apk upgrade && \
     apk add gcc g++ linux-headers bsd-compat-headers libexecinfo-dev \
-            meson ninja numactl-dev py3-elftools xz && \
+            meson ninja numactl-dev py3-elftools \
+            zlib-dev openssl-dev libpcap-dev xz && \
     rm -rf /var/cache/apk/*
 
 ARG DPDK_VERSION=20.11.9
@@ -35,7 +36,7 @@ FROM alpine:${DISTRO_VERSION} as buildenv
 
 # Dependencies
 RUN apk update && apk upgrade && \
-    apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl-dev && \
+    apk add gcc g++ make bsd-compat-headers meson ninja pkgconf libexecinfo numactl-dev py3-elftools && \
     rm -rf /var/cache/apk/*
 
 ARG DPDK_VERSION=20.11.9

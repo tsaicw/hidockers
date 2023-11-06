@@ -6,7 +6,8 @@ FROM ubuntu:${DISTRO_VERSION} as build-dpdk
 
 # Prerequisites
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y build-essential meson ninja-build libnuma-dev python3-pyelftools && \
+    apt-get install -y build-essential meson ninja-build libnuma-dev python3-pyelftools \
+    zlib1g-dev libssl-dev libpcap-dev && \
     rm -rf /var/lib/apt/lists/*
 
 ARG DPDK_VERSION=20.11.9
@@ -34,7 +35,7 @@ FROM ubuntu:${DISTRO_VERSION} as buildenv
 
 # Dependencies
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y build-essential meson ninja-build pkg-config libnuma-dev && \
+    apt-get install -y build-essential meson ninja-build pkg-config libnuma-dev python3-pyelftools && \
     rm -rf /var/lib/apt/lists/*
 
 ARG DPDK_VERSION=20.11.9

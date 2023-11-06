@@ -7,7 +7,8 @@ FROM centos:${DISTRO_VERSION} as build-dpdk
 # Prerequisites
 RUN yum update -y && yum upgrade -y && \
     yum install -y epel-release && \
-    yum install -y meson ninja-build numactl-devel && \
+    yum install -y meson ninja-build numactl-devel \
+                   zlib-devel openssl-devel libpcap-devel elfutils-libelf-devel && \
     yum group install -y "Development Tools" && \
     pip3 install pyelftools && \
     yum clean all && rm -rf /var/cache/yum/*
