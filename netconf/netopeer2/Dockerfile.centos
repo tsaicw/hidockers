@@ -113,7 +113,7 @@ FROM centos:${DISTRO_VERSION}
 
 # Prerequisites
 RUN yum update -y && \
-    yum install -y pcre2 libssh openss && \
+    yum install -y pcre2 libssh openssl && \
     yum clean all && rm -rf /var/cache/yum/*
 
 # Build arguments
@@ -135,14 +135,9 @@ RUN groupadd ${SYSREPO_GROUP} && \
     echo "${NETOPEER2_USER}:${NETOPEER2_PASSWD}" | chpasswd
 
 COPY --from=build ${NETOPEER2_PATH} ${NETOPEER2_PATH}
-RUN ln -s ${NETOPEER2_PATH}/bin/netopeer2-cli /usr/local/bin/ && \
-    ln -s ${NETOPEER2_PATH}/bin/sysrepo-plugind /usr/local/bin/ && \
-    ln -s ${NETOPEER2_PATH}/bin/sysrepocfg /usr/local/bin/ && \
-    ln -s ${NETOPEER2_PATH}/bin/sysrepoctl /usr/local/bin/ && \
-    ln -s ${NETOPEER2_PATH}/bin/yanglint /usr/local/bin/ && \
-    ln -s ${NETOPEER2_PATH}/bin/yangre /usr/local/bin/ && \
+RUN ln -s ${NETOPEER2_PATH}/bin/* /usr/local/bin/ && \
     mkdir -p /usr/local/sbin && \
-    ln -s ${NETOPEER2_PATH}/sbin/netopeer2-server /usr/local/sbin/
+    ln -s ${NETOPEER2_PATH}/sbin/* /usr/local/sbin/
 
 # Customized YANG modules
 COPY yang/ ${NETOPEER2_PATH}/share/yang/modules/custom/
