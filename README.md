@@ -7,7 +7,6 @@
   * cassandra: Cassandra server
   * dynamodb: Amazon DynamoDB server
   * mongodb: MongoDB server
-  * mosquitto: Mosquitto MQTT broker
   * nginx: Nginx server
   * alertmanager: Prometheus Alertmanager
   * grafana: Grafana visual dashboard
@@ -16,3 +15,6 @@
   * rundeck: Rundeck Automation
   * gitlab: GitLab DevOps platform
   * jenkins: Jenkins server
+  * iot
+    * mosquitto: Mosquitto MQTT broker
+    * thingsboard: ThingsBoard IoT platform
