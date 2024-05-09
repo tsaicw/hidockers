@@ -1,0 +1,11 @@
+name: emqx
+
+services:
+  emqx:
+    image: ${EMQX_IMAGE}
+    ports:
+    - 1883:1883    # MQTT
+    - 8083:8083    # WebSocket
+    - 8084:8084
+    - 8883:8883    # SSL/TLS
+    - 18083:18083  # Dashboard

@@ -16,5 +16,6 @@
   * gitlab: GitLab DevOps platform
   * jenkins: Jenkins server
   * iot
+    * emqx: EMQX MQTT broker
     * mosquitto: Mosquitto MQTT broker
     * thingsboard: ThingsBoard IoT platform
