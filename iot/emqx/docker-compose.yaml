@@ -1,11 +1,71 @@
 name: emqx
 
+volumes:
+  data:
+    name: emqx-data
+  log:
+    name: emqx-log
+
+networks:
+  emqx-bridge:
+    driver: bridge
+
 services:
-  emqx:
-    image: ${EMQX_IMAGE}
+  node1:
+    image: ${EMQX_IMAGE}:${EMQX_TAG}
+    hostname: emqx
+    restart: always
     ports:
-    - 1883:1883    # MQTT
-    - 8083:8083    # WebSocket
+    - 1883:1883
+    - 8883:8883
+    - 8083:8083
     - 8084:8084
-    - 8883:8883    # SSL/TLS
-    - 18083:18083  # Dashboard
+    - 18083:18083
+    volumes:
+    - type: volume
+      source: data
+      target: /opt/emqx/data
+    - type: volume
+      source: log
+      target: /opt/emqx/log
+    - type: bind
+      source: ${PWD}/certs
+      target: /home/emqx/certs
+    environment:
+      EMQX_NAME: emqx
+      EMQX_HOST: node1.emqx.io
+      # EMQX_CLUSTER__DISCOVERY_STRATEGY: static
+      # EMQX_CLUSTER__STATIC__SEEDS: '[emqx@node1.emqx.io, emqx@node2.emqx.io]'
+      EMQX_LISTENERS__SSL__DEFAULT__BIND: '0.0.0.0:8883'
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE: /home/emqx/certs/ocarina_ca.crt
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: /home/emqx/certs/server.crt
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: /home/emqx/certs/server.key
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__VERIFY: verify_peer
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__FAIL_IF_NO_PEER_CERT: true
+      EMQX_LISTENERS__WSS__DEFAULT__BIND: '0.0.0.0:8084'
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CACERTFILE: /home/emqx/certs/ocarina_ca.crt
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: /home/emqx/certs/server.crt
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: /home/emqx/certs/server.key
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__VERIFY: verify_peer
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__FAIL_IF_NO_PEER_CERT: true
+    networks:
+      emqx-bridge:
+        aliases:
+        - node1.emqx.io
+
+  # Cluster
+  # node2:
+  #   image: ${EMQX_IMAGE}:${EMQX_TAG}
+  #   ports:
+  #   - 1884:1883
+  #   - 8884:8883
+  #   - 18084:18083
+  #   environment:
+  #     EMQX_NAME: emqx
+  #     EMQX_HOST: node2.emqx.io
+  #     EMQX_CLUSTER__DISCOVERY_STRATEGY: static
+  #     EMQX_CLUSTER__STATIC__SEEDS: '[emqx@node1.emqx.io, emqx@node2.emqx.io]'
+  #   networks:
+  #     emqx-bridge:
+  #       aliases:
+  #       - node2.emqx.io
