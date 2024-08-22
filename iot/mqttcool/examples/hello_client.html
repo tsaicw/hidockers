@@ -1,0 +1,36 @@
+<html>
+<head>
+  <title>Hello IoT World Tutorial</title>
+  <script src="https://unpkg.com/mqtt.cool-web-client/dist/mqtt.cool.js"></script>
+
+  <script>
+    mqttcool.openSession('http://localhost:8080', {
+
+      onConnectionSuccess: function(mqttCoolSession) {
+        var mqttClient = mqttCoolSession.createClient('localmqtt');
+
+        mqttClient.onMessageArrived = onMessageArrived;
+
+        mqttClient.connect({
+          onSuccess: function() {
+            mqttClient.subscribe('telemetry/speed');
+            mqttClient.subscribe('telemetry/rpm');
+          }
+        });
+
+        function onMessageArrived(message) {
+          var dest = message.destinationName;
+          var rowId = dest.split('/', 2)[1];
+          document.getElementById(rowId).innerHTML = message.payloadString;
+        }
+      }
+    });
+  </script>
+</head>
+<body>
+  <div>
+    <div style="float: left;margin-right: 10px;">Speed</div><div id="speed"></div>
+    <div style="float: left;margin-right: 10px;">RPM</div><div id="rpm"></div>
+  </div>
+</body>
+</html>
