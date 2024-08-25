@@ -30,22 +30,23 @@ services:
       target: /opt/emqx/log
     - type: bind
       source: ${PWD}/certs
-      target: /home/emqx/certs
+      target: ${EMQX_CERTS_BIND_PATH}
     environment:
       EMQX_NAME: emqx
       EMQX_HOST: node1.emqx.io
       # EMQX_CLUSTER__DISCOVERY_STRATEGY: static
       # EMQX_CLUSTER__STATIC__SEEDS: '[emqx@node1.emqx.io, emqx@node2.emqx.io]'
+      # EMQX_MQTT__USE_USERNAME_AS_CLIENTID: true
       EMQX_LISTENERS__SSL__DEFAULT__BIND: '0.0.0.0:8883'
-      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE: /home/emqx/certs/ocarina_ca.crt
-      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: /home/emqx/certs/server.crt
-      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: /home/emqx/certs/server.key
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CACERTFILE: ${EMQX_CERTS_BIND_PATH}/ocarina_ca.crt
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__CERTFILE: ${EMQX_CERTS_BIND_PATH}/server.crt
+      EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__KEYFILE: ${EMQX_CERTS_BIND_PATH}/server.key
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__VERIFY: verify_peer
       EMQX_LISTENERS__SSL__DEFAULT__SSL_OPTIONS__FAIL_IF_NO_PEER_CERT: true
       EMQX_LISTENERS__WSS__DEFAULT__BIND: '0.0.0.0:8084'
-      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CACERTFILE: /home/emqx/certs/ocarina_ca.crt
-      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: /home/emqx/certs/server.crt
-      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: /home/emqx/certs/server.key
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CACERTFILE: ${EMQX_CERTS_BIND_PATH}/ocarina_ca.crt
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__CERTFILE: ${EMQX_CERTS_BIND_PATH}/server.crt
+      EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__KEYFILE: ${EMQX_CERTS_BIND_PATH}/server.key
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__VERIFY: verify_peer
       EMQX_LISTENERS__WSS__DEFAULT__SSL_OPTIONS__FAIL_IF_NO_PEER_CERT: true
     networks:
