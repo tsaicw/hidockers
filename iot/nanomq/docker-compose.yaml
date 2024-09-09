@@ -1,0 +1,20 @@
+name: nanomq
+
+services:
+  nanomq:
+    image: ${NANOMQ_IMAGE}:${NANOMQ_TAG}
+    hostname: nanomq
+    restart: always
+    ports:
+    - 1883:1883
+    - 8883:8883
+    - 8083:8083
+    - 8084:8084
+    - 8081:8081
+    volumes:
+    - type: bind
+      source: ${PWD}/configs/nanomq.conf
+      target: /etc/nanomq.conf
+    # - type: bind
+    #   source: ${PWD}/certs
+    #   target: ${NANOMQ_CERTS_BIND_PATH}

@@ -19,4 +19,5 @@
     * emqx: EMQX MQTT broker
     * mosquitto: Mosquitto MQTT broker
     * mqtt.cool: MQTT.Cool server
+    * nanomq: NanoMQ MQTT broker
     * thingsboard: ThingsBoard IoT platform
