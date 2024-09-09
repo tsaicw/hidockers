@@ -57,12 +57,12 @@ curl -X POST -u ${API_KEY}:${SECRET_KEY} \
                "rules": [
                  {
                    "action": "subscribe",
-                   "topic": "/user/${client_id}",
+                   "topic": "user/${client_id}",
                    "permission": "allow"
                  },
                  {
                    "action": "subscribe",
-                   "topic": "/user/${username}",
+                   "topic": "user/${username}",
                    "permission": "allow"
                  },
                  {
