@@ -15,6 +15,12 @@ services:
     - type: bind
       source: ${PWD}/configs/nanomq.conf
       target: /etc/nanomq.conf
+    - type: bind
+      source: ${PWD}/configs/nanomq_pwd.conf
+      target: /etc/nanomq_pwd.conf
+    - type: bind
+      source: ${PWD}/configs/nanomq_acl.conf
+      target: /etc/nanomq_acl.conf
     # - type: bind
     #   source: ${PWD}/certs
     #   target: ${NANOMQ_CERTS_BIND_PATH}
