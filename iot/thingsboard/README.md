@@ -1,7 +1,7 @@
 # ThingsBoard IoT Platform
 
 ## Environment:
-* ThingsBoard 3.6.4
+* ThingsBoard 3.7.0
 * Default credentials
   * **System Administrator** - sysadmin@thingsboard.org / sysadmin
   * **Tenant Administrator** - tenant@thingsboard.org / tenant
@@ -11,5 +11,6 @@
 ```bash
 mkdir -p tb-data tb-logs
 sudo chown -R 799:799 tb-data tb-logs
+
 docker compose up -d
 ```

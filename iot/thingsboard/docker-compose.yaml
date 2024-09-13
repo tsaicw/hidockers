@@ -2,15 +2,19 @@ name: thingsboard
 
 services:
   tb:
-    image: ${TB_IMAGE}
+    image: ${TB_IMAGE}:${TB_TAG}
     restart: always
     ports:
-    - 9090:9090                # Internal HTTP
+    - 8080:9090                # Internal HTTP
     - 1883:1883                # Internal MQTT
     - 7070:7070                # Internal Edge RPC
     - 5683-5688:5683-5688/udp  # Internal COAP and LwM2M
     environment:
       TB_QUEUE_TYPE: in-memory
     # volumes:
-    # - ${PWD}/tb-data:/data
-    # - ${PWD}/tb-logs:/var/log/thingsboard
+    # - type: bind
+    #   source: ${PWD}/tb-data
+    #   target: /data
+    # - type: bind
+    #   source: ${PWD}/tb-logs
+    #   target: /var/log/thingsboard
