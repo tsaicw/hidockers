@@ -3,18 +3,39 @@ name: thingsboard
 services:
   tb:
     image: ${TB_IMAGE}:${TB_TAG}
+    hostname: thingsboard
     restart: always
     ports:
     - 8080:9090                # Internal HTTP
     - 1883:1883                # Internal MQTT
+    - 8883:8883                # Internal MQTT (TLS)
     - 7070:7070                # Internal Edge RPC
     - 5683-5688:5683-5688/udp  # Internal COAP and LwM2M
     environment:
       TB_QUEUE_TYPE: in-memory
-    # volumes:
-    # - type: bind
-    #   source: ${PWD}/tb-data
-    #   target: /data
-    # - type: bind
-    #   source: ${PWD}/tb-logs
-    #   target: /var/log/thingsboard
+      SSL_ENABLED: true
+      SSL_CREDENTIALS_TYPE: PEM
+      SSL_PEM_CERT: ${TB_CERTS_BIND_PATH}/server.pem
+      SSL_PEM_KEY: ${TB_CERTS_BIND_PATH}/server_key.pem
+      MQTT_SSL_ENABLED: true
+      MQTT_SSL_BIND_ADDRESS: 0.0.0.0
+      MQTT_SSL_BIND_PORT: 8883
+      MQTT_SSL_PROTOCOL: TLSv1.3
+      MQTT_SSL_CREDENTIALS_TYPE: PEM
+      MQTT_SSL_PEM_CERT: ${TB_CERTS_BIND_PATH}/server.pem
+      MQTT_SSL_PEM_KEY: ${TB_CERTS_BIND_PATH}/server_key.pem
+      MQTT_SSL_SKIP_VALIDITY_CHECK_FOR_CLIENT_CERT: false
+    volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
+    - type: bind
+      source: ${PWD}/certs
+      target: ${TB_CERTS_BIND_PATH}
+    - type: bind
+      source: ${PWD}/tb-data
+      target: /data
+    - type: bind
+      source: ${PWD}/tb-logs
+      target: /var/log/thingsboard
