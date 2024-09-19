@@ -22,6 +22,10 @@ services:
     - 8084:8084
     - 18083:18083
     volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
     - type: volume
       source: data
       target: /opt/emqx/data
@@ -61,6 +65,11 @@ services:
   #   - 1884:1883
   #   - 8884:8883
   #   - 18084:18083
+  #   volumes:
+  #   - type: bind
+  #     source: /etc/localtime
+  #     target: /etc/localtime
+  #     read_only: true
   #   environment:
   #     EMQX_NAME: emqx
   #     EMQX_HOST: node2.emqx.io

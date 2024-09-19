@@ -23,7 +23,7 @@ services:
       target: /mqtt.cool/pages/test_client/brokers.json
 
   mqtt:
-    image: emqx/emqx:5.7.2
+    image: emqx/emqx:5.8.0
     hostname: mqtt.local
     restart: always
     ports:

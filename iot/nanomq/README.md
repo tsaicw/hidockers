@@ -1,15 +1,15 @@
 # NanoMQ MQTT broker
 
 ## Environment:
-* NanoMQ 0.22.8
+* NanoMQ 0.22.9
 
 ## Port mappings
 | Ports | Usages          |
 | ----- | --------------- |
-| 1883  | MQTT (tcp)      |
-| 8883  | MQTT (ssl)      |
-| 8083  | WebSocket (ws)  |
-| 8084  | WebSocket (wss) |
+| 1883  | MQTT (TCP)      |
+| 8883  | MQTT (TLS)      |
+| 8083  | WebSocket (WS)  |
+| 8084  | WebSocket (WSS) |
 | 8081  | HTTP server     |
 
 ## Usage
