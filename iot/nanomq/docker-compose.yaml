@@ -25,6 +25,14 @@ services:
     - type: bind
       source: ${PWD}/configs/nanomq_acl.conf
       target: /etc/nanomq_acl.conf
-    # - type: bind
-    #   source: ${PWD}/certs
-    #   target: ${NANOMQ_CERTS_BIND_PATH}
+    - type: bind
+      source: ${PWD}/certs
+      target: ${NANOMQ_CERTS_BIND_PATH}
+    # environment:
+    #   NANOMQ_TLS_ENABLE: true
+    #   NANOMQ_TLS_URL: 'tls+nmq-tcp://0.0.0.0:8883'
+    #   NANOMQ_TLS_CA_CERT_PATH: /etc/certs/ocarina_ca.crt
+    #   NANOMQ_TLS_CERT_PATH: /etc/certs/server.crt
+    #   NANOMQ_TLS_KEY_PATH: /etc/certs/server.key
+    #   NANOMQ_TLS_VERIFY_PEER: false
+    #   NANOMQ_TLS_FAIL_IF_NO_PEER_CERT: false
