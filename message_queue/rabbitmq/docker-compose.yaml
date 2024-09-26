@@ -1,0 +1,30 @@
+name: rabbitmq
+volumes:
+  data:
+    name: rabbitmq-data
+
+services:
+  rabbitmq:
+    image: ${RABBITMQ_IMAGE}:${RABBITMQ_TAG}
+    hostname: rabbitmq
+    restart: always
+    ports:
+    - 5672:5672      # AMQP
+    - 15672:15672    # HTTP/Management
+    - 15692:15692    # HTTP/Prometheus
+    # - 1883:1883    # MQTT
+    # - 61613:61613  # STOMP
+    volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
+#    - type: bind
+#      source: ${PWD}/enabled_plugins
+#      target: /etc/rabbitmq/enabled_plugins
+    - type: volume
+      source: data
+      target: /var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}

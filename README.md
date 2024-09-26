@@ -22,3 +22,5 @@
     * mqtt.cool: MQTT.Cool server
     * nanomq: NanoMQ MQTT broker
     * thingsboard: ThingsBoard IoT platform
+  * message queue
+    * rabbitmq: RabbitMQ
