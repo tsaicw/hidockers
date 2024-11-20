@@ -16,6 +16,7 @@
     * cassandra: Cassandra server
     * dynamodb: Amazon DynamoDB server
     * mongodb: MongoDB server
+    * pgadmin: Management tool for PostgreSQL server
     * postgres: PostgreSQL server
   * iot
     * emqx: EMQX MQTT broker

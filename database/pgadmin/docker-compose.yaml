@@ -1,0 +1,29 @@
+name: pgadmin
+
+volumes:
+  data:
+
+services:
+  pgadmin4:
+    image: ${PGADMIN_IMAGE}:${PGADMIN_TAG}
+    hostname: pgadmin
+    restart: always
+    ports:
+    - 80:80
+    - 443:443
+    volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
+    - type: volume
+      source: data
+      target: /var/lib/pgadmin
+    - type: bind
+      source: ${PWD}/certs
+      target: /certs
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_DISABLE_POSTFIX: ${PGADMIN_DISABLE_POSTFIX}
+      # PGADMIN_ENABLE_TLS: ${PGADMIN_ENABLE_TLS}
