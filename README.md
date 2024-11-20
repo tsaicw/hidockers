@@ -16,6 +16,7 @@
     * cassandra: Cassandra server
     * dynamodb: Amazon DynamoDB server
     * mongodb: MongoDB server
+    * postgres: PostgreSQL server
   * iot
     * emqx: EMQX MQTT broker
     * mosquitto: Mosquitto MQTT broker
