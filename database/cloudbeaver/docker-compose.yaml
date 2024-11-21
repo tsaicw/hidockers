@@ -1,0 +1,22 @@
+name: dbeaver
+
+volumes:
+  data:
+
+services:
+  dbeaver:
+    image: ${DBEAVER_IMAGE}:${DBEAVER_TAG}
+    hostname: dbeaver
+    restart: always
+    ports:
+    - 10000:8978
+    volumes:
+    - type: volume
+      source: data
+      target: /opt/cloudbeaver/workspace
+    environment:
+      CB_SERVER_NAME: ${CB_SERVER_NAME}
+      CB_SERVER_URL: ${CB_SERVER_URL}
+      CB_ADMIN_NAME: ${CB_ADMIN_NAME}
+      CB_ADMIN_PASSWORD: ${CB_ADMIN_PASSWORD}
+      CLOUDBEAVER_APP_ANONYMOUS_ACCESS_ENABLED: ${CLOUDBEAVER_APP_ANONYMOUS_ACCESS_ENABLED}

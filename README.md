@@ -14,6 +14,7 @@
   * jenkins: Jenkins server
   * database
     * cassandra: Cassandra server
+    * cloudbeaver: Cloud Database Manager
     * dynamodb: Amazon DynamoDB server
     * mongodb: MongoDB server
     * pgadmin: Management tool for PostgreSQL server
