@@ -1,5 +1,11 @@
 name: dbeaver
 
+include:
+- configs.yaml
+
+networks:
+  cbnet:
+
 volumes:
   data:
 
@@ -8,15 +14,43 @@ services:
     image: ${DBEAVER_IMAGE}:${DBEAVER_TAG}
     hostname: dbeaver
     restart: always
-    ports:
-    - 10000:8978
+    networks:
+      cbnet:
+    # ports:
+    # - 8978
     volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
     - type: volume
       source: data
       target: /opt/cloudbeaver/workspace
+    # configs:
+    # - source: ssl_config
+    #   target: /opt/cloudbeaver/workspace/.data/ssl-config.xml
+    #   mode: 0644
     environment:
       CB_SERVER_NAME: ${CB_SERVER_NAME}
       CB_SERVER_URL: ${CB_SERVER_URL}
       CB_ADMIN_NAME: ${CB_ADMIN_NAME}
       CB_ADMIN_PASSWORD: ${CB_ADMIN_PASSWORD}
       CLOUDBEAVER_APP_ANONYMOUS_ACCESS_ENABLED: ${CLOUDBEAVER_APP_ANONYMOUS_ACCESS_ENABLED}
+
+  nginx:
+    image: nginx:${NGINX_TAG}
+    restart: always
+    networks:
+      cbnet:
+    ports:
+    - ${NGINX_PORT}:8080
+    volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+    configs:
+    - source: nginx_conf
+      target: /etc/nginx/nginx.conf
+    - source: server_crt
+      target: /etc/nginx/cert/server.crt
+    - source: server_key
+      target: /etc/nginx/cert/server.key
