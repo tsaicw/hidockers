@@ -1,7 +1,7 @@
 # EMQX MQTT broker
 
 ## Environment:
-* EMQX 5.7.2
+* EMQX 5.8.x
 
 ## Port mappings
 | Ports | Usages          |
