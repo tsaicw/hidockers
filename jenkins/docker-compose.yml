@@ -1,58 +1,62 @@
-version: "3.8"
-# networks:
-#   jenkins:
+name: jenkins
+
+networks:
+  jenkins:
 
 services:
-  jenkins-docker:
+  docker:
     image: docker:dind
-    network_mode: 'host'
     restart: always
-    # networks:
-    #   jenkins:
-    #     aliases:
-    #       - docker
+    # network_mode: 'host'
+    networks:
+      jenkins:
+        aliases:
+        - docker
     # ports:
-    #   - "2376:2376"
+    # - 2376:2376
     privileged: true
     volumes:
-      - type: bind
-        source: $PWD/volumes/certs
-        target: /certs/client
-      - type: bind
-        source: $PWD/volumes/jenkins_home
-        target: /var/jenkins_home
+    - type: bind
+      source: ${PWD}/volumes/certs
+      target: /certs/client
+    - type: bind
+      source: ${PWD}/volumes/jenkins_home
+      target: /var/jenkins_home
     # extra_hosts:
-    #   - 'host.docker.internal:host-gateway'
+    # - 'host.docker.internal:host-gateway'
     environment:
-      - DOCKER_TLS_CERTDIR=/certs
+    - DOCKER_TLS_CERTDIR=/certs
 
   jenkins:
-    image: galoistsai/jenkins:2.303.1
+    image: galoistsai/jenkins:lts-slim
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile
     depends_on:
-      - jenkins-docker
-    network_mode: 'host'
-    restart: always
-    # networks:
-    #   jenkins:
-    # ports:
-    #   - "8080:8080"
-    #   - "50000:50000"
+    - docker
+    restart: on-failure
+    # network_mode: 'host'
+    networks:
+      jenkins:
+    ports:
+    - 8080:8080
+    - 50000:50000  # Jenkins agents -> Jenkins controller
     volumes:
-      - type: bind
-        source: $PWD/volumes/certs
-        target: /certs/client
-        read_only: true
-      - type: bind
-        source: $PWD/volumes/jenkins_home
-        target: /var/jenkins_home
-      - type: bind
-        source: $PWD/volumes/git_repo
-        target: /home/git_repo
-      - type: bind
-        source: $HOME/.ssh/id_rsa
-        target: /var/jenkins_home/.ssh/id_rsa
+    - type: bind
+      source: ${PWD}/volumes/certs
+      target: /certs/client
+      read_only: true
+    - type: bind
+      source: ${PWD}/volumes/jenkins_home
+      target: /var/jenkins_home
+    - type: bind
+      source: ${PWD}/volumes/git_repo
+      target: /home/git_repo
+    # - type: bind
+    #   source: $HOME/.ssh/id_rsa
+    #   target: /var/jenkins_home/.ssh/id_rsa
     environment:
-#       - DOCKER_HOST=tcp://docker:2376
-      - DOCKER_HOST=tcp://localhost:2376
-      - DOCKER_CERT_PATH=/certs/client
-      - DOCKER_TLS_VERIFY=1
+    - DOCKER_HOST=tcp://docker:2376
+    # - DOCKER_HOST=tcp://localhost:2376
+    - DOCKER_CERT_PATH=/certs/client
+    - DOCKER_TLS_VERIFY=1
