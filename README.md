@@ -19,6 +19,7 @@
     * mongodb: MongoDB server
     * pgadmin: Management tool for PostgreSQL server
     * postgres: PostgreSQL server
+    * redis: Redis server
   * iot
     * emqx: EMQX MQTT broker
     * mosquitto: Mosquitto MQTT broker
