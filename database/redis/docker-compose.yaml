@@ -15,7 +15,7 @@ services:
     networks:
       net:
     ports:
-    - 6379:6379
+    - ${REDIS_PORT}:${REDIS_PORT}
     volumes:
     - type: bind
       source: /etc/localtime
