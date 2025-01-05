@@ -7,6 +7,7 @@
 | Ports | Usages          |
 | ----- | --------------- |
 | 5672  | AMQP            |
+| 5552  | Stream          |
 | 15672 | HTTP/Management |
 | 15692 | HTTP/Prometheus |
 
