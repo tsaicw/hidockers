@@ -28,6 +28,10 @@ services:
     - '5000:5000'
     - '5050:5050'
     volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
     - type: volume
       source: config
       target: /etc/gitlab
@@ -77,6 +81,10 @@ services:
     networks:
       gitlab:
     volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
     - type: volume
       source: alpine_config
       target: /etc/gitlab-runner
@@ -102,6 +110,10 @@ services:
     networks:
       gitlab:
     volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime
+      read_only: true
     - type: volume
       source: ubuntu_config
       target: /etc/gitlab-runner
