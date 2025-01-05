@@ -1,10 +1,10 @@
 # Mosquitto MQTT broker
 
 ## Environment:
-  * Alpine 3.14
+  * Alpine 3.18
   * Mosquitto MQTT message broker
 
 ## Usage:
-```console
+```bash
 docker compose up -d
 ```

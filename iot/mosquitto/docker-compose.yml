@@ -1,4 +1,4 @@
-version: '3.8'
+name: mqtt
 
 volumes:
   data:
@@ -6,7 +6,9 @@ volumes:
 services:
   mosquitto:
     image: mosquitto:alpine
-    build: ${PWD}
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile
     hostname: mosquitto
     restart: always
     ports:
