@@ -1,0 +1,13 @@
+name: ai
+
+services:
+  rovodevcli:
+    image: rovodevcli
+    build:
+      context: ${PWD}
+      dockerfile: Dockerfile
+    hostname: rovodev
+    volumes:
+    - type: bind
+      source: /etc/localtime
+      target: /etc/localtime

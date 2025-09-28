@@ -2,11 +2,11 @@ name: ai
 
 services:
   ollama:
-    image: ollama/ollama:0.11.10
+    image: ollama/ollama:0.12.3
     hostname: ollama
     restart: always
-    # ports:
-    # - 11343:11343
+    ports:
+    - 11343:11343
     volumes:
     - type: bind
       source: /etc/localtime
