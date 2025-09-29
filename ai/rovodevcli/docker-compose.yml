@@ -2,7 +2,7 @@ name: ai
 
 services:
   rovodevcli:
-    image: rovodevcli
+    image: galoistsai/rovodevcli
     build:
       context: ${PWD}
       dockerfile: Dockerfile
